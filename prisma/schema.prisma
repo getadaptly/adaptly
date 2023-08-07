@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Repository {
+  id                Int                @id @default(autoincrement())
+  owner             String
+  name              String
+  fullName          String             @unique @map("full_name")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt
+  pullRequests      PullRequest[]
+  userFeedback      UserFeedback[]
+  dependencyUpdates DependencyUpdate[]
+
+  @@map("repository")
+}
+
+model PullRequest {
+  id                Int                @id @default(autoincrement())
+  number            Int
+  adaptlyApproved   Boolean            @default(false) @map("adaptly_approved")
+  mergedAt          DateTime?          @map("merged_at")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  repositoryId      Int                @map("repository_id")
+  repository        Repository         @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  dependencyUpdates DependencyUpdate[]
+
+  @@unique([repositoryId, number])
+  @@map("pull_request")
+}
+
+model DependencyUpdate {
+  id                   Int         @id @default(autoincrement())
+  dependencyName       String      @map("dependency_name")
+  dependencyUrl        String      @map("dependency_url")
+  dependencyRepoUrl    String      @map("dependency_repo_url")
+  currentVersion       String      @map("current_version")
+  cursorVersion        String      @map("cursor_version")
+  targetVersion        String      @map("target_version")
+  intermediaryVersions String[]    @map("intermediary_versions")
+  manifestFilename     String      @map("manifest_filename")
+  dirName              String      @map("dir_name")
+  pullRequestId        Int         @map("pull_request_id")
+  pullRequest          PullRequest @relation(fields: [pullRequestId], references: [id], onDelete: Cascade)
+  repositoryId         Int         @map("repository_id")
+  repository           Repository  @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  createdAt            DateTime    @default(now()) @map("created_at")
+  updatedAt            DateTime    @updatedAt @map("updated_at")
+
+  @@unique([repositoryId, pullRequestId, dependencyName])
+  @@map("dependency_update")
+}
+
+model UserFeedback {
+  id           Int        @id @default(autoincrement())
+  feedback     String
+  repositoryId Int        @map("repository_id")
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  @@map("user_feedback")
+}

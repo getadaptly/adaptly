@@ -1,0 +1,3 @@
+setup:
+  project: api
+  config: dev
