@@ -21,4 +21,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: getadaptly/adaptly-api:latest
+        tags: getadaptly/adaptly:latest
