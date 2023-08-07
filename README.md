@@ -1,4 +1,4 @@
-![github-hero](https://github.com/getadaptly/api/assets/42170848/0fed4547-9e7e-4f69-b9b6-b5d2125e8cef)
+![a-hero](https://github.com/getadaptly/adaptly/assets/42170848/7a7bdee0-5077-4c11-b7fa-de39302e8f35)
 
 
 <p align="center">
@@ -25,7 +25,8 @@ Next time when you update a dependency, forget about:
 
 Adaptly will do that for you.
 
-![benefits](https://github.com/getadaptly/api/assets/42170848/822abee8-d270-46fd-9f74-608859ffa7e4)
+![b-benefits](https://github.com/getadaptly/adaptly/assets/42170848/bdd5cb6e-36d9-45bd-b67d-b09bfdadceb1)
+
 
 
 <br />
@@ -34,9 +35,11 @@ Adaptly will do that for you.
 
 Trigger Adaptly with a simple comment on any PR that updates dependencies:
 
-<img src="https://github.com/getadaptly/api/assets/42170848/5d505640-c79d-4781-aaff-de668e6bb6aa" width="640px">
+<img src="https://github.com/getadaptly/adaptly/assets/42170848/1624348a-d82f-41d5-89d8-5fee8abeb75e" width="640px">
 
-![spacer](https://github.com/getadaptly/api/assets/42170848/8db4a723-38ae-4b7b-b4fc-99f83c63bae8)
+
+![spacer](https://github.com/getadaptly/adaptly/assets/42170848/f263691c-dca6-437b-bd29-1dac8c59cda1)
+
 
 Then, Adaptly will:
 
@@ -45,11 +48,12 @@ Then, Adaptly will:
 
 <br />
 
-<img src="https://github.com/getadaptly/api/assets/42170848/861a1d27-e317-493e-9b76-f63e7c195fe6" width="640px">
+<img src="https://github.com/getadaptly/adaptly/assets/42170848/33eaf18b-7584-48f5-8d9e-6137da1ce67f" width="640px">
 
-![spacer](https://github.com/getadaptly/api/assets/42170848/8db4a723-38ae-4b7b-b4fc-99f83c63bae8)
 
-<img src="https://github.com/getadaptly/api/assets/42170848/0607f98b-bf1e-4748-8c1d-4950f80c16db" width="640px">
+![spacer](https://github.com/getadaptly/adaptly/assets/42170848/f263691c-dca6-437b-bd29-1dac8c59cda1)
+
+<img src="https://github.com/getadaptly/adaptly/assets/42170848/83a2f63e-a632-4110-b567-0ce011c44b27" width="640px">
 
 <br />
 
@@ -63,7 +67,7 @@ Adaptly can handle multiple dependency updates within a pull request. If additio
 
 ### Languages supported
 
-<img src="https://github.com/getadaptly/api/assets/42170848/f48d6b3a-f415-478b-ab59-aa4504ba1292" width="128px">
+<img src="https://github.com/getadaptly/adaptly/assets/42170848/8f897dbf-d768-4e5d-b0d9-6bbda8f24fe6" width="128px">
 
 
 ## Getting started
@@ -106,7 +110,7 @@ Table of contents:
         1. In production Adaptly is connected to a specific repository. In development we need to simulate it, so replace “owner” and “name” in “prisma/seed.ts” by repository 
         2. Run “npx prisma db seed” to seed database with data
     3. Build prisma client “pnpm build:prisma”
-    4. To learn how to view database data and apply migrations check “[Local development database](https://github.com/getadaptly/api/blob/main/README.md#local-development-database)” section.
+    4. To learn how to view database data and apply migrations check “[Local development database](https://github.com/getadaptly/adaptly/blob/main/README.md#local-development-database)” section.
 
 ## Running Adaptly locally
 
