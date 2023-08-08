@@ -2,7 +2,9 @@ import Logger from "@adaptly/logging/logger";
 import { BotsUsageOrganisation, getBotsUsage } from "./bots-usage";
 import { getOrganizationInfo } from "./organisation-info";
 
-const organisations = ['supabase'];
+const mostStarredOrganisations = ['supabase'];
+
+const organisationSpecific: string = '';
 
 
 async function getOrganisationsBotsUsage(organisations: string[]): Promise<BotsUsageOrganisation[]> {
@@ -22,7 +24,9 @@ async function getOrganisationsBotsUsage(organisations: string[]): Promise<BotsU
         return avgBMerged - avgAMerged;
       });;
 }
- 
+
+const organisations = !!organisationSpecific ? [organisationSpecific] : mostStarredOrganisations;
+
 getOrganisationsBotsUsage(organisations).then((organisationsBotsUsage) => {
     Logger.debug("organisationsBotsUsage", organisationsBotsUsage);
 });
