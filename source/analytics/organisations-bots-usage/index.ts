@@ -28,5 +28,7 @@ async function getOrganisationsBotsUsage(organisations: string[]): Promise<BotsU
 const organisations = !!organisationSpecific ? [organisationSpecific] : mostStarredOrganisations;
 
 getOrganisationsBotsUsage(organisations).then((organisationsBotsUsage) => {
-    Logger.debug("organisationsBotsUsage", organisationsBotsUsage);
+    organisationsBotsUsage.forEach(organisation => {
+        Logger.debug(`"${organisation.name}" organisation bots usage`, organisation);
+    });
 });

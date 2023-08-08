@@ -5,7 +5,7 @@ import { distributionOfPRs } from "./pull-requests/distributionOfPRs";
 import { ratioOfMergedPRsToTotal } from "./pull-requests/ratioOfMergedPRsToTotal";
 import { totalNumberOfPRs } from "./pull-requests/totalNumberOfPRs";
 
-export type BotsUsageOrganisation = { organisationName: string; } & BotsUsage & {
+export type BotsUsageOrganisation = { name: string; } & BotsUsage & {
     repositories: BotsUsageRepository[];
 };
   
@@ -51,7 +51,7 @@ export function getBotsUsage(organisation: Organization): BotsUsageOrganisation 
   const orgMetrics = getOrganisationBotsUsage(reposWithMetrics);
 
   return {
-      organisationName: organisation.name,
+      name: organisation.name,
       renovate: orgMetrics.renovate,
       dependabot: orgMetrics.dependabot,
       repositories: reposWithMetrics
