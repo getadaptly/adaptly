@@ -5,5 +5,5 @@ export function ratioOfMergedPRsToTotal(pullRequests: PullRequest[]): number {
     
     const mergedPRs = pullRequests.filter(pr => pr.merged).length;
 
-    return parseFloat((mergedPRs / pullRequests.length * 100).toFixed());
+    return parseFloat((mergedPRs / pullRequests.length).toFixed(2));
 }
