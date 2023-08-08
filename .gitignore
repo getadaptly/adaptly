@@ -13,3 +13,5 @@ tmp/**/*
 *.pem
 
 .DS_Store
+
+organisations-bots-usage.txt

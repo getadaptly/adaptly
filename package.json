@@ -22,7 +22,8 @@
         "eval-ts": "doppler run -- jest eval/isFileAffected.typescript.test.ts",
         "eval-py": "doppler run -- jest eval/isFileAffected.python.test.ts",
         "prisma-studio": "doppler run -- prisma studio",
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+        "organisations-bots-usage": "doppler run -- ts-node source/analytics/organisations-bots-usage/index.ts > organisations-bots-usage.txt"
     },
     "prisma": {
         "seed": "doppler run -- ts-node prisma/seed.ts"
@@ -65,6 +66,8 @@
         "cors": "2.8.5",
         "express": "4.17.1",
         "fast-glob": "3.3.0",
+        "graphql": "16.7.1",
+        "graphql-request": "6.1.0",
         "jsonwebtoken": "^9.0.0",
         "markdown-it": "^13.0.1",
         "openai": "^3.3.0",
