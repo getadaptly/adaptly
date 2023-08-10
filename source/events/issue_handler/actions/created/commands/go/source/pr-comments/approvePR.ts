@@ -8,6 +8,7 @@ import { updateComment } from '@adaptly/services/github/issues/comments/updateCo
 import Logger from '@adaptly/logging/logger';
 import { findRepository } from '@adaptly/database/operations/repository/read';
 import { updatePullRequest } from '@adaptly/database/operations/pull-request/update';
+import { DependencyUpdate } from '../pr-dependencies/getDependenciesUpdated';
 
 export async function approvePr(reports: RefactorsReport[], payload: IssueCommentEvent, octokit: Octokit): Promise<void> {
     const canApprovePr = reports.every((report) => report.refactors.length === 0);
@@ -16,7 +17,7 @@ export async function approvePr(reports: RefactorsReport[], payload: IssueCommen
         return;
     }
 
-    const message = await getApprovalMessage(reports);
+    const message = await getApprovalMessage(reports.map((report) => report.dependencyUpdate));
     const loadingCommentId = await getRefactorsLoadingCommentId(payload, octokit);
 
     if (loadingCommentId) {
@@ -30,22 +31,22 @@ export async function approvePr(reports: RefactorsReport[], payload: IssueCommen
     await approveDatabasePullRequest(payload.repository.full_name, payload.issue.number);
 }
 
-async function getApprovalMessage(reports: RefactorsReport[]): Promise<string> {
-    let message = `:white_check_mark:&nbsp;&nbsp;No refactors found! This PR looks good to me!\n\n`;
+export async function getApprovalMessage(dependencyUpdates: DependencyUpdate[]): Promise<string> {
+    let message = `:white_check_mark:&nbsp;&nbsp;All versions checked successfully! This PR looks good to me!\n\n`;
 
     let counter = 1;
 
-    for (const report of reports) {
-        const dependencyName = report.dependencyUpdate.dependencyName;
-        const cursorVersion = report.dependencyUpdate.cursorVersion;
+    for (const update of dependencyUpdates) {
+        const dependencyName = update.dependencyName;
+        const cursorVersion = update.cursorVersion;
 
-        const releaseUrl = await getReleaseUrl(report.dependencyUpdate.dependencyRepoUrl, cursorVersion);
+        const releaseUrl = await getReleaseUrl(update.dependencyRepoUrl, cursorVersion);
 
-        message += `\nPackage: [${dependencyName}](${report.dependencyUpdate.dependencyUrl})\nVersion: [${cursorVersion}](${releaseUrl})\n`;
+        message += `\nPackage: [${dependencyName}](${update.dependencyUrl})\nTarget version reached: [${cursorVersion}](${releaseUrl})\n`;
 
-        message += getProgressMessage(report.dependencyUpdate);
+        message += getProgressMessage(update);
 
-        if (counter < reports.length) {
+        if (counter < dependencyUpdates.length) {
             message += `---\n`;
         }
 
