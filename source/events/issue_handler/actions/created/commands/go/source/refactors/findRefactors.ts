@@ -247,7 +247,7 @@ export async function isFileAffected(packageName: string, breakingChange: Breaki
             content: isIndirectFile(file) ? filesAtRiskIndirectConfirmationPrompt : filesAtRiskDirectConfirmationPrompt
         });
 
-        const doubleCheckCompletion = await chatCompletion(filesAtRiskConversation, MODEL);
+        const doubleCheckCompletion = await chatCompletion(filesAtRiskConversation, GPT4_MODEL);
         doubleCheckCompletionData = doubleCheckCompletion.data;
     } catch (error) {
         throwOpenAiError(error, filesAtRiskConversation);
