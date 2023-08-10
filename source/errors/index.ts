@@ -1,4 +1,4 @@
-export const userErrorPrefix = `Make sure that this development branch has the latest code from the parent branch by either rebasing or merging the parent branch into this branch. Then, try again. \n\nIf that did not help, please, report us the Error code: `;
+export const userErrorPrefix = `Please, try again. Also, make sure that this development branch has the latest code from the parent branch by either rebasing or merging the parent branch into this branch. \n\nIf that did not help, please, report us the Error code: `;
 export const internalErrorPrefix = 'Adaptly Error: ';
 
 export type AdaptlyErrorValue = {
