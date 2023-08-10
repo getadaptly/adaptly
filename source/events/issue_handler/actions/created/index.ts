@@ -78,7 +78,7 @@ async function handleError(error: any, payload: IssueCommentEvent, octokit: Octo
     captureException(error);
 
     if (error instanceof AdaptlyError) {
-        const comment = `:sob: Error\n\n${userErrorPrefix} ${error.value.code}`;
+        const comment = `:boom: Error\n\n${userErrorPrefix} ${error.value.code}`;
 
         await cleanUpLoadingComments(payload, octokit);
 

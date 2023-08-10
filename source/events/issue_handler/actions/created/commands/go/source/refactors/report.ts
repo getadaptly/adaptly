@@ -75,7 +75,7 @@ async function getRefactorMessage(
 ): Promise<string> {
     const releaseUrl = await getReleaseUrl(dependecyRepoUrl, cursorVersion);
 
-    let message = `:bangbang:&nbsp;&nbsp;Refactor needed.\n\nPackage: [${dependencyName}](${dependencyUrl})\nVersion: [${cursorVersion}](${releaseUrl})\n\nBreaking change: ${breakingChange.title}\n`;
+    let message = `:construction:&nbsp;&nbsp;Refactor needed.\n\nPackage: [${dependencyName}](${dependencyUrl})\nVersion: [${cursorVersion}](${releaseUrl})\n\nBreaking change: ${breakingChange.title}\n`;
 
     message += '\n<details>\n<summary>Check details</summary>\n\n';
     message += breakingChange.description;
