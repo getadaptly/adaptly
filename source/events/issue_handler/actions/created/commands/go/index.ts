@@ -21,13 +21,13 @@ import { getPrInfo } from '@adaptly/services/github/pulls/getPrInfo';
 export const go = async (payload: IssueCommentEvent, installationId: number, octokit: Octokit) => {
     Logger.info('/adaptly go invoked', { repository: payload.repository.full_name, PR: `#${payload.issue.number}` });
 
-    postBreakingChangesLoading(payload, octokit);
+    await postBreakingChangesLoading(payload, octokit);
 
     await setupRepositoryLocally(payload, installationId, octokit);
 
     const updatedDependencies = await getPackagesDependenciesUpdated(payload, octokit);
     if (!updatedDependencies.length) {
-        await communicateNoDependencyUpdatesFound(payload, octokit);
+        await communicatePRLooksGood(payload, octokit);
         return;
     }
 
@@ -66,10 +66,10 @@ export async function deleteRepositoryLocally(payload: IssueCommentEvent): Promi
     await rimraf(path.dirname(destinationPath));
 }
 
-async function communicateNoDependencyUpdatesFound(payload: IssueCommentEvent, octokit: Octokit): Promise<void> {
-    Logger.info('Responding about no dependency updates found');
+async function communicatePRLooksGood(payload: IssueCommentEvent, octokit: Octokit): Promise<void> {
+    Logger.info('Responding that PR with no dependency updates looks good');
 
-    const message = `No dependency updates to check in this PR`;
+    const message = `:white_check_mark:&nbsp;&nbsp;This PR looks good!\n\n`;
 
     const loadingCommentId = await getBreakingChangesLoadingCommentId(payload, octokit);
 
