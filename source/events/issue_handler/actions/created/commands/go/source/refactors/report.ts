@@ -2,7 +2,7 @@ import { Octokit } from '@octokit/core';
 import { IssueCommentEvent } from '@octokit/webhooks-types';
 import { RefactorsReport } from '.';
 import { BreakingChange } from '../breaking-changes/findBreakingChanges';
-import { getReleaseUrl } from '../pr-comments/body';
+import { getProgressMessage, getReleaseUrl } from '../pr-comments/body';
 import { REFACTORS_LOADING_MESSAGE } from '../pr-comments/postRefactorsLoading';
 import { Refactor } from './findRefactors';
 import Logger from '@adaptly/logging/logger';
@@ -34,7 +34,7 @@ async function reportRefactors(
     const loadingCommentId = await getRefactorsLoadingCommentId(payload, octokit);
 
     for (let refactor of refactors) {
-        const message = await getRefactorMessage(
+        let message = await getRefactorMessage(
             dependencyUpdate.dependencyName,
             dependencyUpdate.cursorVersion,
             dependencyUpdate.dependencyRepoUrl,
@@ -44,6 +44,10 @@ async function reportRefactors(
             payload.repository.html_url,
             payload.repository.default_branch
         );
+
+        const progress = getProgressMessage(dependencyUpdate);
+
+        message += `${progress}`;
 
         if (dependencyUpdateNumber === 1 && counter === 1 && loadingCommentId) {
             await updateComment(payload.repository.full_name, loadingCommentId, message, octokit);
@@ -75,7 +79,7 @@ async function getRefactorMessage(
 ): Promise<string> {
     const releaseUrl = await getReleaseUrl(dependecyRepoUrl, cursorVersion);
 
-    let message = `:construction:&nbsp;&nbsp;Refactor needed.\n\nPackage: [${dependencyName}](${dependencyUrl})\nVersion: [${cursorVersion}](${releaseUrl})\n\nBreaking change: ${breakingChange.title}\n`;
+    let message = `:construction:&nbsp;&nbsp;Refactor needed\n\nPackage: [${dependencyName}](${dependencyUrl})\nVersion: [${cursorVersion}](${releaseUrl})\n\nBreaking change: ${breakingChange.title}\n`;
 
     message += '\n<details>\n<summary>Check details</summary>\n\n';
     message += breakingChange.description;

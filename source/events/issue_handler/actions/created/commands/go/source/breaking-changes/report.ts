@@ -41,7 +41,7 @@ async function getBreakingChangesMessage(dependencyUpdate: DependencyUpdate, bre
     if (breakingChanges.length) {
         const releaseUrl = await getReleaseUrl(dependencyUpdate.dependencyRepoUrl, dependencyUpdate.cursorVersion);
 
-        message = `:information_source:&nbsp;&nbsp;Breaking Changes in the Dependency's Changelog.\n\nPackage: [${dependencyUpdate.dependencyName}](${dependencyUpdate.dependencyUrl})\nVersion: [${dependencyUpdate.cursorVersion}](${releaseUrl})\n`;
+        message = `:information_source:&nbsp;&nbsp;Breaking Changes in the Dependency's Changelog\n\nPackage: [${dependencyUpdate.dependencyName}](${dependencyUpdate.dependencyUrl})\nVersion: [${dependencyUpdate.cursorVersion}](${releaseUrl})\n`;
 
         let breakingChangeNumber = 1;
 
