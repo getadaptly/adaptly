@@ -35,7 +35,7 @@ type ErrorKey =
     | 'openAiFailedRefactors'
     | 'dependencyUpdateNotFound'
     | 'unknownError'
-    | 'payloadMissingInformation'
+    | 'requestMissingInformation'
     | 'getInstallationId'
     | 'createOctokit'
     | 'missingEnvironmentVariable'
@@ -160,9 +160,9 @@ export const ADAPTLY_ERRORS: ErrorEncodings = {
         code: '29',
         message: 'Unknown error'
     },
-    payloadMissingInformation: {
+    requestMissingInformation: {
         code: '30',
-        message: 'Payload is missing information'
+        message: 'Request is missing information'
     },
     getInstallationId: {
         code: '31',
