@@ -60,7 +60,7 @@ Your output should be a comprehensive JSON object containing the following field
     },
     "explanation": {
         "type": "string",
-        "description": "Explain the reasoning that you carried out. Format this string correctly for JSON parsing, including escaping new lines."   
+        "description": "Explain the reasoning that you carried out. Format this string correctly for JSON parsing, including escaping new lines. Explanation can be maximum 3 sentences."   
     },
 }`;
 
