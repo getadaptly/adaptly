@@ -36,7 +36,7 @@ export const go = async (payload: IssueCommentEvent, installationId: number, oct
     await reportBreakingChangesReports(breakingChangesReports, payload, octokit);
 
     await postRefactorsLoading(payload, octokit);
-    const refactorsReports = await getRefactorsReports(breakingChangesReports, payload, octokit);
+    const refactorsReports = await getRefactorsReports(breakingChangesReports, payload);
     await reportRefactorsReports(refactorsReports, payload, octokit);
 
     await upsertDatabaseState(

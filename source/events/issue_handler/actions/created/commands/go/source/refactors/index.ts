@@ -8,15 +8,11 @@ export type RefactorsReport = BreakingChangesReport & {
     refactors: Refactor[];
 };
 
-export async function getRefactorsReports(
-    breakingChangesReports: BreakingChangesReport[],
-    payload: IssueCommentEvent,
-    octokit: Octokit
-): Promise<RefactorsReport[]> {
+export async function getRefactorsReports(breakingChangesReports: BreakingChangesReport[], payload: IssueCommentEvent): Promise<RefactorsReport[]> {
     const reports: RefactorsReport[] = [];
 
     for (const report of breakingChangesReports) {
-        const refactors = await findRefactors(report.dependencyUpdate, report.breakingChanges, payload, octokit);
+        const refactors = await findRefactors(report.dependencyUpdate, report.breakingChanges, payload);
 
         reports.push({
             ...report,

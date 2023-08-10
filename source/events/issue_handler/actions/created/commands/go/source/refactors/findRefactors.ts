@@ -138,12 +138,7 @@ export type Refactor = {
     filesAtRisk: string[];
 };
 
-export async function findRefactors(
-    update: DependencyUpdate,
-    breakingChanges: BreakingChange[],
-    payload: IssueCommentEvent,
-    octokit: Octokit
-): Promise<Refactor[]> {
+export async function findRefactors(update: DependencyUpdate, breakingChanges: BreakingChange[], payload: IssueCommentEvent): Promise<Refactor[]> {
     if (!breakingChanges.length) {
         return [];
     }
