@@ -16,7 +16,7 @@ export async function updateBranchReference(
             force: force
         });
 
-        Logger.info('Updated branch reference', { repository: repoName, branchName, commitSha, force, response: data });
+        Logger.info('Updated branch reference', { repository: repoName, branchName, commitSha, force });
     } catch (error) {
         throwUpdatingBranchReferenceError(error, { repoName, branchName, commitSha, force });
     }

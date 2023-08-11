@@ -19,7 +19,7 @@ export async function clone(repoName: string, installationId: number, destinatio
 
         const response = await git().clone(`https://x-access-token:${installationToken}@github.com/${repoName}.git`, destinationPath);
 
-        Logger.info('Repository cloned locally', { repoName, destinationPath, gitCloneResponse: response });
+        Logger.info('Repository cloned locally', { repoName, destinationPath });
     } catch (err) {
         console.error('failed: ', err);
     }

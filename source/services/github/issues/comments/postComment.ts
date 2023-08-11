@@ -17,7 +17,7 @@ export async function postComment(repoName: string, pullRequestNumber: number, m
             body: message
         });
 
-        Logger.info('Posted pull request comment', { repository: repoName, PR: `#${pullRequestNumber}`, response: comment });
+        Logger.info('Posted pull request comment', { repository: repoName, PR: `#${pullRequestNumber}` });
         return comment;
     } catch (error) {
         throwPostingCommentError(error, { repoName, pullRequestNumber, message });

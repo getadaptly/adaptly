@@ -20,7 +20,7 @@ export async function createNewCommit(
 
         const commitSha = data.sha;
 
-        Logger.info('Created a new commit', { repository: repoName, packageName, packageVersion, treeSha, parentCommitSha, response: data });
+        Logger.info('Created a new commit', { repository: repoName, packageName, packageVersion, treeSha, parentCommitSha });
 
         return commitSha;
     } catch (error) {

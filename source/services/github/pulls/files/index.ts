@@ -40,7 +40,7 @@ export async function getManifests(payload: IssueCommentEvent, octokit: Octokit)
             page += 1;
         }
 
-        Logger.info(`Extracted repository manifest files`, { repository: repoFullName, PR: `#${prId}`, response: manifestFiles });
+        Logger.info(`Extracted repository manifest files`, { repository: repoFullName, PR: `#${prId}`, manifestFiles });
         return manifestFiles;
     } catch (error) {
         throwManifestError(error);

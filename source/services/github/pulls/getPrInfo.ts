@@ -24,7 +24,7 @@ export async function getPrInfo(payload: IssueCommentEvent, octokit: Octokit): P
         const response = await octokit.request(`GET /repos/${repoFullName}/pulls/${prId}`);
         const prInfo: PrInfo = response.data;
 
-        Logger.info(`Fetched PR information`, { repository: repoFullName, PR: `#${prId}`, response: prInfo });
+        Logger.info(`Fetched PR information`, { repository: repoFullName, PR: `#${prId}` });
 
         return prInfo;
     } catch (error) {

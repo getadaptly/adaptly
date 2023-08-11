@@ -9,7 +9,7 @@ export async function getParentCommitSha(repoName: string, branchName: string, o
 
         const parentCommitSha = data.object.sha;
 
-        Logger.info('Got parent commit sha', { repository: repoName, branchName, parentCommitSha, response: data });
+        Logger.info('Got parent commit sha', { repository: repoName, branchName, parentCommitSha });
 
         return parentCommitSha;
     } catch (error) {

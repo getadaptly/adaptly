@@ -11,7 +11,7 @@ export async function postCommentReaction(repoName: string, commentId: number, r
             content: reaction
         });
 
-        Logger.info(`Posted comment reaction`, { repository: repoName, commentId, reaction, response: data });
+        Logger.info(`Posted comment reaction`, { repository: repoName, commentId, reaction });
     } catch (error) {
         throwPostingCommentReactionError(error, { repoName, commentId, reaction });
     }

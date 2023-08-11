@@ -23,7 +23,7 @@ export async function createTreeObjects(repoName: string, updatedFiles: File[], 
             })
         );
 
-        Logger.info('Created tree objects', { repository: repoName, updatedFiles, baseTreeSha, response: tree });
+        Logger.info('Created tree objects', { repository: repoName });
         return tree;
     } catch (error) {
         throwCreatingTreeObjectsError(error, { repoName, updatedFiles, baseTreeSha });
