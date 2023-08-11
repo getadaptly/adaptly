@@ -107,7 +107,7 @@ async function extractBreakingChanges(packageName: string, cursorVersion: string
 
     try {
         // here we need to specify function to have good JSON reply structure
-        const completion = await chatCompletion(breakingChangesConversation, GPT4_MODEL);
+        const completion = await chatCompletion(breakingChangesConversation, MODEL);
 
         Logger.info('ChatGPT: Breaking changes extracted', { packageName, cursorVersion, response: completion.data });
 
