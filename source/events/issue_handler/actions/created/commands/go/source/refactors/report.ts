@@ -10,9 +10,16 @@ import { getComments } from '@adaptly/services/github/issues/comments/getComment
 import { postComment } from '@adaptly/services/github/issues/comments/postComment';
 import { updateComment } from '@adaptly/services/github/issues/comments/updateComment';
 import { DependencyUpdate } from '../pr-dependencies/getDependenciesUpdated';
+import { approvePr } from '../pr-comments/approvePR';
+import { goAgain } from '../pr-comments/goAgain';
 
 export async function reportRefactorsReports(reports: RefactorsReport[], payload: IssueCommentEvent, octokit: Octokit): Promise<void> {
     Logger.info('Reporting refactors', { repository: payload.repository.full_name, PR: `#${payload.issue.number}` });
+
+    if (hasNoRefactors(reports)) {
+        await reportNoRefactors(reports, payload, octokit);
+        return;
+    }
 
     let dependencyUpdateNumber = 1;
 
@@ -20,6 +27,20 @@ export async function reportRefactorsReports(reports: RefactorsReport[], payload
         await reportRefactors(report.dependencyUpdate, report.refactors, dependencyUpdateNumber, payload, octokit);
         dependencyUpdateNumber++;
     }
+}
+
+function hasNoRefactors(reports: RefactorsReport[]): boolean {
+    return reports.every((report) => report.refactors.length === 0);
+}
+
+async function reportNoRefactors(reports: RefactorsReport[], payload: IssueCommentEvent, octokit: Octokit): Promise<void> {
+    const allUpdatesChecked = reports.map((report) => report.dependencyUpdate).every((update) => update.cursorVersion === update.targetVersion);
+
+    if (allUpdatesChecked) {
+        await approvePr(reports, payload, octokit);
+    }
+
+    await goAgain(reports, payload, octokit);
 }
 
 async function reportRefactors(

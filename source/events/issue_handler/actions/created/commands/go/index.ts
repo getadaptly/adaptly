@@ -10,7 +10,7 @@ import { getRefactorsReports } from './source/refactors';
 import { postBreakingChangesLoading } from './source/pr-comments/postBreakingChangesLoading';
 import { postRefactorsLoading } from './source/pr-comments/postRefactorsLoading';
 import { reportBreakingChangesReports, getBreakingChangesLoadingCommentId } from './source/breaking-changes/report';
-import { approvePr, getApprovalMessage } from './source/pr-comments/approvePR';
+import { getApprovalMessage } from './source/pr-comments/approvePR';
 import { reportRefactorsReports } from './source/refactors/report';
 import { postComment } from '@adaptly/services/github/issues/comments/postComment';
 import { updateComment } from '@adaptly/services/github/issues/comments/updateComment';
@@ -44,7 +44,6 @@ export const go = async (payload: IssueCommentEvent, installationId: number, oct
         refactorsReports.map((refactor) => refactor.dependencyUpdate)
     );
 
-    await approvePr(refactorsReports, payload, octokit);
     await deleteRepositoryLocally(payload);
 };
 
