@@ -8,7 +8,7 @@ WORKDIR /app
 RUN npm install -g pnpm
 
 # Install Python, make, g++, gcc
-RUN apk add --update --no-cache python3 make g++ gcc && ln -sf python3 /usr/bin/python
+RUN apk add --update --no-cache python3 make g++ gcc git && ln -sf python3 /usr/bin/python
 
 # Install pip3
 RUN apk add --update --no-cache py3-pip
