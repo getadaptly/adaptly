@@ -20,7 +20,7 @@ export const ADAPTLY_USER_LOGIN = 'adaptly-bot[bot]';
 
 export const created = async (payload: IssueCommentEvent, installationId: number, octokit: Octokit) => {
     if (shouldIgnore(payload)) {
-        Logger.info('Ignoring PR comment', { comment: payload.comment, sender: payload.sender });
+        Logger.info('Ignoring PR comment', { comment: payload.comment.body, sender: payload.sender.login });
         return;
     }
 

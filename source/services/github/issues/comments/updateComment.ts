@@ -10,7 +10,7 @@ export async function updateComment(repoName: string, commentId: number, message
             body: message
         });
 
-        Logger.info(`Updated pull request comment`, { repository: repoName, updatedCommendId: commentId, response: comment });
+        Logger.info(`Updated pull request comment`, { repository: repoName, updatedCommendId: commentId });
         return comment;
     } catch (error) {
         throwUpdatingCommentError(error, { repoName, commentId, message });

@@ -7,7 +7,7 @@ export async function deleteComment(repoName: string, commentId: number, octokit
     try {
         const { data } = await octokit.request(`DELETE /repos/${repoName}/issues/comments/${commentId}`);
 
-        Logger.info(`Deleted pull request comment`, { repository: repoName, deletedCommendId: commentId, response: data });
+        Logger.info(`Deleted pull request comment`, { repository: repoName, deletedCommendId: commentId });
     } catch (error) {
         throwDeletingCommentError(error, { repoName, commentId });
     }

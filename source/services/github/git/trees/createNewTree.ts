@@ -12,7 +12,7 @@ export async function createNewTree(repoName: string, tree: any[], baseTreeSha: 
 
         const treeSha = data.sha;
 
-        Logger.info('Created a new tree', { repository: repoName, tree, baseTreeSha, response: data });
+        Logger.info('Created a new tree', { repository: repoName, tree, baseTreeSha });
 
         return treeSha;
     } catch (error) {

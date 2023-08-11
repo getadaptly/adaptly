@@ -10,7 +10,7 @@ export async function getCommitHistory(repoName: string, branchName: string, oct
             per_page: 100
         });
 
-        Logger.info('Fetched commit history', { repository: repoName, branchName, response: commitHistory });
+        Logger.info('Fetched commit history', { repository: repoName, branchName });
 
         return commitHistory;
     } catch (error) {

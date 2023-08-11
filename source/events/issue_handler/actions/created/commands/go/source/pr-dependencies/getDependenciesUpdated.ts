@@ -27,7 +27,7 @@ export async function getDependenciesUpdated(
     payload: IssueCommentEvent,
     octokit: Octokit
 ): Promise<DependencyUpdate[]> {
-    Logger.info(`Getting dependencies updated for ${payload.repository.full_name} in !${payload.issue.number}`);
+    Logger.info(`Getting dependencies updated for ${payload.repository.full_name} in #${payload.issue.number}`);
     const parser = ParserFactory.getParser(manifestFilename);
 
     // HEAD: PR branch
