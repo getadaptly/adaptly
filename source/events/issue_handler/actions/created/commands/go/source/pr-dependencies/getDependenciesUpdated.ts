@@ -51,10 +51,6 @@ export async function getDependenciesUpdated(
                 const cursorVersion = dependencyUpdateInDatabase ? dependencyUpdateInDatabase.cursorVersion : currentVersion;
                 const targetVersion = dependenciesHead[dependency];
 
-                if (hasReachedTargetVersion(cursorVersion, targetVersion)) {
-                    continue;
-                }
-
                 Logger.info(`Found an update for ${dependency} from ${currentVersion} to ${targetVersion}`);
 
                 const dependencyRepoUrl = await parser.getDependencyRepoUrl(dependency);
@@ -98,18 +94,6 @@ function formatVersions(versions: string[]): string[] {
 
 function formatVersion(version: string): string {
     return version.startsWith('v') ? version : `v${version}`;
-}
-
-function hasReachedTargetVersion(cursorVersion: string, targetVersion: string): boolean {
-    if (semver.eq(cursorVersion, targetVersion)) {
-        return true;
-    }
-
-    if (semver.gt(cursorVersion, targetVersion)) {
-        return true;
-    }
-
-    return false;
 }
 
 function getPackageDirectory(manifestFilename: string): string {

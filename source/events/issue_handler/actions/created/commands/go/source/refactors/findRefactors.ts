@@ -138,12 +138,7 @@ export type Refactor = {
     filesAtRisk: string[];
 };
 
-export async function findRefactors(
-    update: DependencyUpdate,
-    breakingChanges: BreakingChange[],
-    payload: IssueCommentEvent,
-    octokit: Octokit
-): Promise<Refactor[]> {
+export async function findRefactors(update: DependencyUpdate, breakingChanges: BreakingChange[], payload: IssueCommentEvent): Promise<Refactor[]> {
     if (!breakingChanges.length) {
         return [];
     }
@@ -221,7 +216,7 @@ export async function isFileAffected(packageName: string, breakingChange: Breaki
     const modelResponse = parseJSON(modelMessage.content);
 
     if (!isValidModelResponse(modelResponse)) {
-        throwOpenAiError('Invalid model response', { response: modelResponse });
+        throwOpenAiError('Invalid isFileAffected 1st check model response', { response: modelResponse });
     }
 
     let isAffected = modelResponse.functionality_directly_used && modelResponse.given_code_needs_refactor && modelResponse.change_breaks_given_code;
@@ -247,7 +242,7 @@ export async function isFileAffected(packageName: string, breakingChange: Breaki
             content: isIndirectFile(file) ? filesAtRiskIndirectConfirmationPrompt : filesAtRiskDirectConfirmationPrompt
         });
 
-        const doubleCheckCompletion = await chatCompletion(filesAtRiskConversation, MODEL);
+        const doubleCheckCompletion = await chatCompletion(filesAtRiskConversation, GPT4_MODEL);
         doubleCheckCompletionData = doubleCheckCompletion.data;
     } catch (error) {
         throwOpenAiError(error, filesAtRiskConversation);
@@ -258,7 +253,7 @@ export async function isFileAffected(packageName: string, breakingChange: Breaki
     const doubleCheckModelResponse = parseJSON(messageContent);
 
     if (!isValidModelResponse(doubleCheckModelResponse)) {
-        throwOpenAiError('Invalid model response', { response: modelResponse });
+        throwOpenAiError('Invalid isFileAffected 2nd check model response', { response: modelResponse });
     }
 
     isAffected = doubleCheckModelResponse.functionality_directly_used && doubleCheckModelResponse.given_code_needs_refactor;

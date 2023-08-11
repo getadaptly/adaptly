@@ -6,12 +6,10 @@ import { getReleaseUrl, getProgressMessage } from './body';
 import { postComment } from '@adaptly/services/github/issues/comments/postComment';
 import { updateComment } from '@adaptly/services/github/issues/comments/updateComment';
 import Logger from '@adaptly/logging/logger';
-import { findRepository } from '@adaptly/database/operations/repository/read';
-import { updatePullRequest } from '@adaptly/database/operations/pull-request/update';
 import { DependencyUpdate } from '../pr-dependencies/getDependenciesUpdated';
 
-export async function approvePr(reports: RefactorsReport[], payload: IssueCommentEvent, octokit: Octokit): Promise<void> {
-    const message = await getApprovalMessage(reports.map((report) => report.dependencyUpdate));
+export async function goAgain(reports: RefactorsReport[], payload: IssueCommentEvent, octokit: Octokit): Promise<void> {
+    const message = await getContinueMessage(reports.map((report) => report.dependencyUpdate));
     const loadingCommentId = await getRefactorsLoadingCommentId(payload, octokit);
 
     if (loadingCommentId) {
@@ -20,13 +18,11 @@ export async function approvePr(reports: RefactorsReport[], payload: IssueCommen
         await postComment(payload.repository.full_name, payload.issue.number, message, octokit);
     }
 
-    Logger.info('Approved PR', { repository: payload.repository.full_name, PR: `${payload.issue.number}` });
-
-    await approveDatabasePullRequest(payload.repository.full_name, payload.issue.number);
+    Logger.info('Go again on PR', { repository: payload.repository.full_name, PR: `${payload.issue.number}` });
 }
 
-export async function getApprovalMessage(dependencyUpdates: DependencyUpdate[]): Promise<string> {
-    let message = `:white_check_mark:&nbsp;&nbsp;All versions checked successfully! This PR looks good to me!\n\n`;
+export async function getContinueMessage(dependencyUpdates: DependencyUpdate[]): Promise<string> {
+    let message = `:arrows_counterclockwise:&nbsp;&nbsp;No refactors found given the changelog breaking changes.\n\nDouble check the breaking changes in changelog, and if all is good, run \`/adaptly go\` to continue.\n\n`;
 
     let counter = 1;
 
@@ -36,7 +32,7 @@ export async function getApprovalMessage(dependencyUpdates: DependencyUpdate[]):
 
         const releaseUrl = await getReleaseUrl(update.dependencyRepoUrl, cursorVersion);
 
-        message += `\nPackage: [${dependencyName}](${update.dependencyUrl})\nTarget version reached: [${cursorVersion}](${releaseUrl})\n`;
+        message += `\nPackage: [${dependencyName}](${update.dependencyUrl})\nVersion: [${cursorVersion}](${releaseUrl})\n`;
 
         message += getProgressMessage(update);
 
@@ -48,10 +44,4 @@ export async function getApprovalMessage(dependencyUpdates: DependencyUpdate[]):
     }
 
     return message;
-}
-
-async function approveDatabasePullRequest(repositoryFullName: string, pullRequestNumber: number): Promise<void> {
-    const repository = await findRepository(repositoryFullName);
-
-    await updatePullRequest(repository.id, pullRequestNumber, { adaptlyApproved: true });
 }

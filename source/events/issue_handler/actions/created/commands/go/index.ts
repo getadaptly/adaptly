@@ -10,32 +10,33 @@ import { getRefactorsReports } from './source/refactors';
 import { postBreakingChangesLoading } from './source/pr-comments/postBreakingChangesLoading';
 import { postRefactorsLoading } from './source/pr-comments/postRefactorsLoading';
 import { reportBreakingChangesReports, getBreakingChangesLoadingCommentId } from './source/breaking-changes/report';
-import { approvePr } from './source/pr-comments/approvePR';
+import { getApprovalMessage } from './source/pr-comments/approvePR';
 import { reportRefactorsReports } from './source/refactors/report';
 import { postComment } from '@adaptly/services/github/issues/comments/postComment';
 import { updateComment } from '@adaptly/services/github/issues/comments/updateComment';
 import { clone, getCloneDestinationPath } from '@adaptly/services/git/clone';
 import { checkout } from '@adaptly/services/git/checkout';
 import { getPrInfo } from '@adaptly/services/github/pulls/getPrInfo';
+import { DependencyUpdate } from './source/pr-dependencies/getDependenciesUpdated';
 
 export const go = async (payload: IssueCommentEvent, installationId: number, octokit: Octokit) => {
     Logger.info('/adaptly go invoked', { repository: payload.repository.full_name, PR: `#${payload.issue.number}` });
 
     await postBreakingChangesLoading(payload, octokit);
 
-    await setupRepositoryLocally(payload, installationId, octokit);
-
     const updatedDependencies = await getPackagesDependenciesUpdated(payload, octokit);
-    if (!updatedDependencies.length) {
-        await communicatePRLooksGood(payload, octokit);
+    if (!updatedDependencies.length || allVersionsChecked(updatedDependencies)) {
+        await communicatePRLooksGood(payload, updatedDependencies, octokit);
         return;
     }
+
+    await setupRepositoryLocally(payload, installationId, octokit);
 
     const breakingChangesReports = await getBreakingChangesReports(updatedDependencies, payload);
     await reportBreakingChangesReports(breakingChangesReports, payload, octokit);
 
     await postRefactorsLoading(payload, octokit);
-    const refactorsReports = await getRefactorsReports(breakingChangesReports, payload, octokit);
+    const refactorsReports = await getRefactorsReports(breakingChangesReports, payload);
     await reportRefactorsReports(refactorsReports, payload, octokit);
 
     await upsertDatabaseState(
@@ -43,9 +44,12 @@ export const go = async (payload: IssueCommentEvent, installationId: number, oct
         refactorsReports.map((refactor) => refactor.dependencyUpdate)
     );
 
-    await approvePr(refactorsReports, payload, octokit);
     await deleteRepositoryLocally(payload);
 };
+
+function allVersionsChecked(updatedDependencies: DependencyUpdate[]): boolean {
+    return updatedDependencies.every((dependency) => dependency.cursorVersion === dependency.targetVersion);
+}
 
 async function setupRepositoryLocally(payload: IssueCommentEvent, installationId: number, octokit: Octokit): Promise<void> {
     const repoName = payload.repository.full_name;
@@ -66,10 +70,10 @@ export async function deleteRepositoryLocally(payload: IssueCommentEvent): Promi
     await rimraf(path.dirname(destinationPath));
 }
 
-async function communicatePRLooksGood(payload: IssueCommentEvent, octokit: Octokit): Promise<void> {
+async function communicatePRLooksGood(payload: IssueCommentEvent, updatedDependencies: DependencyUpdate[], octokit: Octokit): Promise<void> {
     Logger.info('Responding that PR with no dependency updates looks good');
 
-    const message = `:white_check_mark:&nbsp;&nbsp;This PR looks good!\n\n`;
+    const message = await getApprovalMessage(updatedDependencies);
 
     const loadingCommentId = await getBreakingChangesLoadingCommentId(payload, octokit);
 
