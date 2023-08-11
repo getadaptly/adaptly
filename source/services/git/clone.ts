@@ -3,7 +3,9 @@ import git from 'simple-git';
 import fs from 'fs';
 import util from 'util';
 import path from 'path';
-import Logger from '@adaptly/logging/logger';
+import Logger, { getMessage } from '@adaptly/logging/logger';
+import { AdaptlyError, ErrorHandler } from '@adaptly/errors/types';
+import { ADAPTLY_ERRORS } from '@adaptly/errors';
 
 const rmdir = util.promisify(fs.rm);
 
@@ -17,21 +19,17 @@ export async function clone(repoName: string, installationId: number, destinatio
     try {
         await deleteClonedRepository(destinationPath);
 
-        const response = await git().clone(`https://x-access-token:${installationToken}@github.com/${repoName}.git`, destinationPath);
+        await git().clone(`https://x-access-token:${installationToken}@github.com/${repoName}.git`, destinationPath);
 
         Logger.info('Repository cloned locally', { repoName, destinationPath });
-    } catch (err) {
-        console.error('failed: ', err);
+    } catch (error) {
+        throwCloneError(error, { repoName, destinationPath });
     }
 }
 
 async function deleteClonedRepository(destinationPath: string): Promise<void> {
-    try {
-        if (fs.existsSync(destinationPath)) {
-            await rmdir(destinationPath, { recursive: true });
-        }
-    } catch (err) {
-        console.error('failed: ', err);
+    if (fs.existsSync(destinationPath)) {
+        await rmdir(destinationPath, { recursive: true });
     }
 }
 
@@ -40,3 +38,9 @@ const tmp = path.resolve(__dirname, '../../../tmp');
 export function getCloneDestinationPath(repoName: string): string {
     return path.join(tmp, repoName);
 }
+
+const throwCloneError: ErrorHandler = (error: any, context?: any) => {
+    Logger.error(getMessage(ADAPTLY_ERRORS.repoCloneError), error, context);
+
+    throw new AdaptlyError(ADAPTLY_ERRORS.repoCloneError, context);
+};
