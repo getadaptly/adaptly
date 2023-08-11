@@ -6,8 +6,6 @@ import { getReleaseUrl, getProgressMessage } from './body';
 import { postComment } from '@adaptly/services/github/issues/comments/postComment';
 import { updateComment } from '@adaptly/services/github/issues/comments/updateComment';
 import Logger from '@adaptly/logging/logger';
-import { findRepository } from '@adaptly/database/operations/repository/read';
-import { updatePullRequest } from '@adaptly/database/operations/pull-request/update';
 import { DependencyUpdate } from '../pr-dependencies/getDependenciesUpdated';
 
 export async function goAgain(reports: RefactorsReport[], payload: IssueCommentEvent, octokit: Octokit): Promise<void> {
@@ -20,9 +18,7 @@ export async function goAgain(reports: RefactorsReport[], payload: IssueCommentE
         await postComment(payload.repository.full_name, payload.issue.number, message, octokit);
     }
 
-    Logger.info('Approved PR', { repository: payload.repository.full_name, PR: `${payload.issue.number}` });
-
-    await approveDatabasePullRequest(payload.repository.full_name, payload.issue.number);
+    Logger.info('Go again on PR', { repository: payload.repository.full_name, PR: `${payload.issue.number}` });
 }
 
 export async function getContinueMessage(dependencyUpdates: DependencyUpdate[]): Promise<string> {
@@ -48,10 +44,4 @@ export async function getContinueMessage(dependencyUpdates: DependencyUpdate[]):
     }
 
     return message;
-}
-
-async function approveDatabasePullRequest(repositoryFullName: string, pullRequestNumber: number): Promise<void> {
-    const repository = await findRepository(repositoryFullName);
-
-    await updatePullRequest(repository.id, pullRequestNumber, { adaptlyApproved: true });
 }
