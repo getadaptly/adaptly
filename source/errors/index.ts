@@ -41,7 +41,8 @@ type ErrorKey =
     | 'missingEnvironmentVariable'
     | 'openAiEmptyMessageContent'
     | 'couldNotResolvePathImport'
-    | 'repoCheckoutError';
+    | 'repoCheckoutError'
+    | 'repoCloneError';
 
 type ErrorEncodings = {
     [key in ErrorKey]: AdaptlyErrorValue;
@@ -187,5 +188,9 @@ export const ADAPTLY_ERRORS: ErrorEncodings = {
     repoCheckoutError: {
         code: '36',
         message: 'Could not checkout repository'
+    },
+    repoCloneError: {
+        code: '37',
+        message: 'Could not clone repository'
     }
 };
