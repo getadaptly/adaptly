@@ -2,7 +2,7 @@ import { getChangelog } from '@adaptly/services/adaptly/changelogHunter';
 import Logger, { getMessage } from '@adaptly/logging/logger';
 import { ChatCompletionRequestMessage, CreateChatCompletionResponse } from 'openai';
 import { DependencyUpdate } from '@adaptly/events/issue_handler/actions/created/commands/go/source/pr-dependencies/getDependenciesUpdated';
-import { openai, MAX_NUM_TOKENS, MODEL, GPT4_MODEL } from '@adaptly/services/openai/client';
+import { GPT4_MODEL } from '@adaptly/services/openai/client';
 import { RoleSystem, RoleUser } from '@adaptly/services/openai/types';
 import { ErrorHandler, OpenAiError } from '@adaptly/errors/types';
 import { ADAPTLY_ERRORS } from '@adaptly/errors';

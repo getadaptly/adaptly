@@ -1,7 +1,7 @@
 import Bottleneck from 'bottleneck';
 import { ChatCompletionRequestMessage, CreateChatCompletionResponse } from 'openai';
 import retry from 'retry';
-import { openai, MODEL, MAX_NUM_TOKENS } from '@adaptly/services/openai/client';
+import { openai, MODEL, MAX_NUM_TOKENS_8K, MAX_NUM_TOKENS_16K } from '@adaptly/services/openai/client';
 import { AxiosResponse } from 'axios';
 
 const bottleneck = new Bottleneck({
@@ -26,7 +26,7 @@ export const chatCompletion = (
                     openai.createChatCompletion({
                         model: model,
                         temperature: 0.0,
-                        max_tokens: MAX_NUM_TOKENS,
+                        max_tokens: model === MODEL ? MAX_NUM_TOKENS_8K : MAX_NUM_TOKENS_16K,
                         messages: messages
                     })
                 );
