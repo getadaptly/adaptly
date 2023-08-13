@@ -35,6 +35,12 @@ export async function getOctokit(repoName: string): Promise<{ octokit: Octokit; 
     }
 }
 
+export async function getOctokitLight(): Promise<Octokit> {
+    const accessToken = getEnv('GITHUB_ACCESS_TOKEN');
+
+    return new Octokit({ auth: accessToken });
+}
+
 const throwCreatingOctokitError: ErrorHandler = (error: any, context?: any) => {
     Logger.error(getMessage(ADAPTLY_ERRORS.createOctokit), error, context);
     throw new OctokitError(ADAPTLY_ERRORS.createOctokit, context);

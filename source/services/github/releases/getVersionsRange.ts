@@ -32,7 +32,7 @@ export async function getVersionsRange(
 
     try {
         while (fetching) {
-            const response = await octokit.request(`GET /repos/${repoOwner}/${repoName}/releases?page=${page}&per_page=20`);
+            const response = await octokit.request(`GET /repos/${repoOwner}/${repoName}/releases?page=${page}&per_page=100`);
             const data = response.data as Release[];
 
             const releases = data.map((release: any) => {

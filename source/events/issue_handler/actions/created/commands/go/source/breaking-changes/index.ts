@@ -8,10 +8,7 @@ export type BreakingChangesReport = {
     breakingChanges: BreakingChange[];
 };
 
-export async function getBreakingChangesReports(
-    updatedDependencies: DependencyUpdate[],
-    payload: IssueCommentEvent
-): Promise<BreakingChangesReport[]> {
+export async function getBreakingChangesReports(updatedDependencies: DependencyUpdate[]): Promise<BreakingChangesReport[]> {
     const reports: BreakingChangesReport[] = [];
 
     for (const update of updatedDependencies) {
@@ -25,12 +22,6 @@ export async function getBreakingChangesReports(
             breakingChanges: breakingChanges.changes
         });
     }
-
-    Logger.info(`Prepared breaking changes reports`, {
-        repository: payload.repository.full_name,
-        PR: `#${payload.issue.number}`,
-        reports
-    });
 
     return reports;
 }

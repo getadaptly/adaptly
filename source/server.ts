@@ -4,6 +4,7 @@ import Logger from '@adaptly/logging/logger';
 import config from '@adaptly/config/server';
 import { serverHealthCheckRoutes } from '@adaptly/routes/serverHealthCheck';
 import { webhook } from '@adaptly/routes/webhook';
+import { canMergePR } from '@adaptly/routes/canMergePR';
 import bodyParser from 'body-parser';
 import * as Sentry from '@sentry/node';
 import { getEnv } from './env';
@@ -39,6 +40,7 @@ app.use(bodyParser.json());
  */
 app.use(serverHealthCheckRoutes);
 app.use(webhook);
+app.use(canMergePR);
 
 /**
  * Set up CORS
