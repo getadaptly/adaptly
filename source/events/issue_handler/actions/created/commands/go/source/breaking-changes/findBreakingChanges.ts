@@ -25,7 +25,8 @@ const breakingChangesPrompt = `You are a senior software engineer with the task 
 A "breaking change" is an update that:
 - Changes the behavior of an existing function or feature in a way that is not backward-compatible. This could be changes to method signatures, return values, or exception types, etc.
 - Removes or deprecates an existing function or feature.
-- Adds or alters a feature in a way that requires a mandatory change to the consumer's codebase to maintain functionality.
+
+Note: Unless explicitly stated in the changelog, assume that the new or modified feature is backward compatible.
 
 You task can be broken down into the following steps:
 
