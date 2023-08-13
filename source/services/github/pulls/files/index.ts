@@ -9,10 +9,7 @@ type PrFile = {
     filename: string;
 };
 
-export async function getManifests(payload: IssueCommentEvent, octokit: Octokit): Promise<PrFile[]> {
-    const repoFullName = payload.repository.full_name;
-    const prId = payload.issue.number;
-
+export async function getManifests(repoFullName: string, prNumber: number, octokit: Octokit): Promise<PrFile[]> {
     let page = 1;
 
     const manifestFiles: PrFile[] = [];
@@ -22,7 +19,7 @@ export async function getManifests(payload: IssueCommentEvent, octokit: Octokit)
 
     try {
         while (true) {
-            const response = await octokit.request(`GET /repos/${repoFullName}/pulls/${prId}/files?per_page=50&page=${page}`);
+            const response = await octokit.request(`GET /repos/${repoFullName}/pulls/${prNumber}/files?per_page=50&page=${page}`);
 
             const data: PrFile[] = response.data;
 
@@ -40,7 +37,7 @@ export async function getManifests(payload: IssueCommentEvent, octokit: Octokit)
             page += 1;
         }
 
-        Logger.info(`Extracted repository manifest files`, { repository: repoFullName, PR: `#${prId}`, manifestFiles });
+        Logger.info(`Extracted repository manifest files`, { repository: repoFullName, PR: `#${prNumber}`, manifestFiles });
         return manifestFiles;
     } catch (error) {
         throwManifestError(error);

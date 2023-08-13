@@ -24,16 +24,17 @@ export type DependencyUpdate = {
 export async function getDependenciesUpdated(
     manifestFilename: string,
     prInfo: PrInfo,
-    payload: IssueCommentEvent,
+    repoFullName: string,
+    prNumber: number,
     octokit: Octokit
 ): Promise<DependencyUpdate[]> {
-    Logger.info(`Getting dependencies updated for ${payload.repository.full_name} in #${payload.issue.number}`);
+    Logger.info(`Getting dependencies updated for ${repoFullName} in #${prNumber}`);
     const parser = ParserFactory.getParser(manifestFilename);
 
     // HEAD: PR branch
     // BASE: the branch the PR is trying to merge into (master, main, dev)
-    const manifestHead = await getFileContent(payload.repository.full_name, manifestFilename, octokit, prInfo.head.sha);
-    const manifestBase = await getFileContent(payload.repository.full_name, manifestFilename, octokit, prInfo.base.sha);
+    const manifestHead = await getFileContent(repoFullName, manifestFilename, octokit, prInfo.head.sha);
+    const manifestBase = await getFileContent(repoFullName, manifestFilename, octokit, prInfo.base.sha);
 
     const dependenciesHead = parser.parseDependencies(manifestHead);
     const dependenciesBase = parser.parseDependencies(manifestBase);
@@ -45,7 +46,7 @@ export async function getDependenciesUpdated(
     for (let dependency of baseDependencies) {
         if (dependenciesHead[dependency]) {
             if (dependenciesHead[dependency] !== dependenciesBase[dependency]) {
-                const dependencyUpdateInDatabase = await retrieveDependencyUpdate(dependency, payload.issue.number, payload.repository.full_name);
+                const dependencyUpdateInDatabase = await retrieveDependencyUpdate(dependency, prNumber, repoFullName);
 
                 const currentVersion = dependenciesBase[dependency];
                 const cursorVersion = dependencyUpdateInDatabase ? dependencyUpdateInDatabase.cursorVersion : currentVersion;
