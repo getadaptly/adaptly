@@ -113,10 +113,8 @@ async function extractBreakingChanges(packageName: string, cursorVersion: string
 
     try {
         // here we need to specify function to have good JSON reply structure
-        const completion = await chatCompletion(breakingChangesConversation, MODEL);
-
+        const completion = await chatCompletion(breakingChangesConversation, GPT4_MODEL);
         Logger.info('ChatGPT: Breaking changes extracted', { packageName, cursorVersion, breakingChanges: completion.data.choices });
-
         completionData = completion.data;
     } catch (error) {
         throwOpenAiError(error, breakingChangesConversation);
@@ -130,10 +128,9 @@ async function extractBreakingChanges(packageName: string, cursorVersion: string
             content: `${breakingChangesDoubleCheckPrompt}`
         });
 
-        const completion = await chatCompletion(breakingChangesConversation, MODEL);
+        const completion = await chatCompletion(breakingChangesConversation, GPT4_MODEL);
         Logger.info('Double check ChatGPT: Breaking changes extracted', { packageName, cursorVersion, breakingChanges: completion.data.choices });
         completionData = completion.data;
-
         breakingChanges = getBreakingChangesFromChatCompletion(completionData);
     }
 
