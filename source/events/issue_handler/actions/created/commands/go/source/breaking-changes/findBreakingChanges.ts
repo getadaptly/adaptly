@@ -63,7 +63,10 @@ Avoid explanations and reply with a JSON following this schema:
   "required": ["breaking_changes"]
 }`;
 
-const breakingChangesDoubleCheckPrompt = ``;
+const breakingChangesDoubleCheckPrompt = `Please review your analysis, paying close attention to the following:
+
+- For each breaking change found, double check that is fits the provided definition of "breaking change". If it doesn't, remove it from the list.
+- For each entry, confirm that the titles and descriptions are clear, concise, and would provide software engineers with an immediate understanding of the impact to their code and how to mitigate it.`;
 
 export async function findBreakingChanges(dependencyUpdate: DependencyUpdate): Promise<BreakingChanges> {
     let cursorVersion: string | undefined = moveCursorVersion(dependencyUpdate);
@@ -119,6 +122,25 @@ async function extractBreakingChanges(packageName: string, cursorVersion: string
         throwOpenAiError(error, breakingChangesConversation);
     }
 
+    let breakingChanges = getBreakingChangesFromChatCompletion(completionData);
+
+    if (breakingChanges.length > 0) {
+        breakingChangesConversation.push({
+            role: RoleSystem,
+            content: `${breakingChangesDoubleCheckPrompt}`
+        });
+
+        const completion = await chatCompletion(breakingChangesConversation, MODEL);
+        Logger.info('Double check ChatGPT: Breaking changes extracted', { packageName, cursorVersion, breakingChanges: completion.data.choices });
+        completionData = completion.data;
+
+        breakingChanges = getBreakingChangesFromChatCompletion(completionData);
+    }
+
+    return breakingChanges;
+}
+
+export function getBreakingChangesFromChatCompletion(completionData: CreateChatCompletionResponse): BreakingChange[] {
     const messageContent = getMessageContent(completionData);
     const breakingChanges = parseJSON(messageContent).breaking_changes;
 
