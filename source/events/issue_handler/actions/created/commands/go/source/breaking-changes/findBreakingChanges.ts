@@ -33,8 +33,8 @@ You task can be broken down into the following steps:
 1. Extract the changelog content and the version from the text enclosed within <changelog> and <version> tags respectively. If a TL;DR is provided, ignore it.
 2. Segment the changelog into individual updates, using cues such as headers, bullet points, or semantic indicators.
 3. For each update, using the definition of "breaking change" above, identify if the update classifies as one.
-4. For breaking changes, copy over the title and write a short description of the change. This summary is going to be presented to a software engineer that needs to understand if this change affects his codebase. 
-   If code examples of the necessary refactors are presented, include them using \`\`\`diff \`\`\` syntax showing before and after. 
+4. For breaking changes, copy over the title and write a short and concise description of the change. The goal is to provide software engineers with an immediate understanding of the potential impact on their codebase, without overwhelming them with unnecessary details. 
+   If possible, provide code refactoring examples using \`\`\`diff \`\`\` syntax showing before and after. 
 
 Avoid explanations and reply with a JSON following this schema:
 
@@ -62,6 +62,8 @@ Avoid explanations and reply with a JSON following this schema:
   },
   "required": ["breaking_changes"]
 }`;
+
+const breakingChangesDoubleCheckPrompt = ``;
 
 export async function findBreakingChanges(dependencyUpdate: DependencyUpdate): Promise<BreakingChanges> {
     let cursorVersion: string | undefined = moveCursorVersion(dependencyUpdate);
