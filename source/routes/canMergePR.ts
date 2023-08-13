@@ -5,7 +5,7 @@ import Logger from '@adaptly/logging/logger';
 import { Octokit } from '@octokit/core';
 import { getOctokitLight } from '@adaptly/services/github/auth/octokit';
 import { getPackagesDependenciesUpdated } from '@adaptly/events/issue_handler/actions/created/commands/go/source/pr-dependencies';
-import { getBreakingChangesReports } from '@adaptly/events/issue_handler/actions/created/commands/go/source/breaking-changes';
+import { BreakingChangesReport, getBreakingChangesReports } from '@adaptly/events/issue_handler/actions/created/commands/go/source/breaking-changes';
 
 const canMergePR = express.Router();
 
@@ -15,16 +15,8 @@ type RequestBody = {
 };
 
 canMergePR.post('/can-merge-pr', async (req: Request, res: Response) => {
-    try {
-        const response = await processRequest(req, res);
-        return response;
-    } catch (error: any) {
-        Logger.error('Error encountered', error);
-
-        return res.status(422).json({
-            message: 'Unprocessable entitiy'
-        });
-    }
+    const response = await processRequest(req, res);
+    return response;
 });
 
 async function processRequest(req: Request, res: Response): Promise<Response> {
@@ -42,15 +34,14 @@ async function processRequest(req: Request, res: Response): Promise<Response> {
     const prNumber = payload.prNumber;
     const octokit = await getOctokitLight();
 
-    if (await canMerge(repoNameWithOwner, prNumber, octokit)) {
-        return res.status(200).json({
-            canMerge: true
+    try {
+        const verdict = await getVerdict(repoNameWithOwner, prNumber, octokit);
+        return res.status(200).json(verdict);
+    } catch (error: any) {
+        return res.status(422).json({
+            message: error.message
         });
     }
-
-    return res.status(200).json({
-        canMerge: false
-    });
 }
 
 function isRequestPayload(body: any): body is RequestBody {
@@ -61,7 +52,14 @@ function isRequestPayload(body: any): body is RequestBody {
     return body.repoNameWithOwner && body.prNumber;
 }
 
-async function canMerge(repoNameWithOwner: string, prNumber: number, octokit: Octokit): Promise<boolean> {
+type Verdict = {
+    canMerge: boolean;
+    reachedTargetVersion: boolean;
+    noBreakingChanges: boolean;
+    breakingChangesReports: BreakingChangesReport[];
+};
+
+async function getVerdict(repoNameWithOwner: string, prNumber: number, octokit: Octokit): Promise<Verdict> {
     const updatedDependencies = await getPackagesDependenciesUpdated(repoNameWithOwner, prNumber, octokit);
     const breakingChangesReports = await getBreakingChangesReports(updatedDependencies);
 
@@ -71,7 +69,12 @@ async function canMerge(repoNameWithOwner: string, prNumber: number, octokit: Oc
 
     const noBreakingChanges = breakingChangesReports.every((report) => report.breakingChanges.length === 0);
 
-    return reachedTargetVersion && noBreakingChanges;
+    return {
+        canMerge: reachedTargetVersion && noBreakingChanges,
+        reachedTargetVersion,
+        noBreakingChanges,
+        breakingChangesReports
+    };
 }
 
 export { canMergePR };
