@@ -37,7 +37,11 @@ export async function getManifests(repoFullName: string, prNumber: number, octok
             page += 1;
         }
 
-        Logger.info(`Extracted repository manifest files`, { repository: repoFullName, PR: `#${prNumber}`, manifestFiles });
+        Logger.info(`Extracted repository manifest files`, {
+            repository: repoFullName,
+            PR: `#${prNumber}`
+        });
+
         return manifestFiles;
     } catch (error) {
         throwManifestError(error);
