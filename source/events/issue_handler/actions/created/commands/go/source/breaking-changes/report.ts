@@ -15,6 +15,20 @@ export async function reportBreakingChangesReports(
     octokit: Octokit
 ): Promise<void> {
     let counter = 1;
+
+    if (breakingChangesReports.every((report) => report.breakingChanges.length === 0)) {
+        const loadingCommentId = await getBreakingChangesLoadingCommentId(payload, octokit);
+        const message = `:white_check_mark:&nbsp;&nbsp;All versions checked successfully! This PR looks good to me!\n\n`;
+
+        if (loadingCommentId) {
+            await updateComment(payload.repository.full_name, loadingCommentId, message, octokit);
+        } else {
+            await postComment(payload.repository.full_name, payload.issue.number, message, octokit);
+        }
+
+        return;
+    }
+
     for (const report of breakingChangesReports) {
         const message = await getBreakingChangesMessage(report.dependencyUpdate, report.breakingChanges);
 
@@ -41,7 +55,7 @@ async function getBreakingChangesMessage(dependencyUpdate: DependencyUpdate, bre
     if (breakingChanges.length) {
         const releaseUrl = await getReleaseUrl(dependencyUpdate.dependencyRepoUrl, dependencyUpdate.cursorVersion);
 
-        message = `:information_source:&nbsp;&nbsp;Breaking Changes in the Dependency's Changelog\n\nPackage: [${dependencyUpdate.dependencyName}](${dependencyUpdate.dependencyUrl})\nVersion: [${dependencyUpdate.cursorVersion}](${releaseUrl})\n`;
+        message = `:information_source:&nbsp;&nbsp;Breaking Changes in the Dependency's Changelog. Check breaking changes and run \`/adaptly go\` to continue checking next versions.\n\nPackage: [${dependencyUpdate.dependencyName}](${dependencyUpdate.dependencyUrl})\nVersion: [${dependencyUpdate.cursorVersion}](${releaseUrl})\n`;
 
         let breakingChangeNumber = 1;
 
