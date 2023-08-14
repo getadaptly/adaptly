@@ -16,12 +16,9 @@ export type PrInfo = {
     };
 };
 
-export async function getPrInfo(payload: IssueCommentEvent, octokit: Octokit): Promise<PrInfo> {
-    const repoFullName = payload.repository.full_name;
-    const prId = payload.issue.number;
-
+export async function getPrInfo(repoFullName: string, prNumber: number, octokit: Octokit): Promise<PrInfo> {
     try {
-        const response = await octokit.request(`GET /repos/${repoFullName}/pulls/${prId}`);
+        const response = await octokit.request(`GET /repos/${repoFullName}/pulls/${prNumber}`);
         const prInfo: PrInfo = response.data;
 
         const commitsResponse = await octokit.request(`GET /repos/${repoFullName}/pulls/${prId}/commits`);
@@ -32,7 +29,7 @@ export async function getPrInfo(payload: IssueCommentEvent, octokit: Octokit): P
 
         return prInfo;
     } catch (error) {
-        throwPrInfoError(error, { repoFullName, prId });
+        throwPrInfoError(error, { repoFullName, prNumber: prNumber });
     }
 }
 

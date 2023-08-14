@@ -24,7 +24,7 @@ export const go = async (payload: IssueCommentEvent, installationId: number, oct
 
     await postBreakingChangesLoading(payload, octokit);
 
-    const updatedDependencies = await getPackagesDependenciesUpdated(payload, octokit);
+    const updatedDependencies = await getPackagesDependenciesUpdated(payload.repository.full_name, payload.issue.number, octokit);
     if (!updatedDependencies.length || allVersionsChecked(updatedDependencies)) {
         await communicatePRLooksGood(payload, updatedDependencies, octokit);
         return;
@@ -32,7 +32,13 @@ export const go = async (payload: IssueCommentEvent, installationId: number, oct
 
     await setupRepositoryLocally(payload, installationId, octokit);
 
-    const breakingChangesReports = await getBreakingChangesReports(updatedDependencies, payload);
+    const breakingChangesReports = await getBreakingChangesReports(updatedDependencies);
+    Logger.info(`Prepared breaking changes reports`, {
+        repository: payload.repository.full_name,
+        PR: `#${payload.issue.number}`,
+        breakingChangesReports
+    });
+
     await reportBreakingChangesReports(breakingChangesReports, payload, octokit);
 
     await postRefactorsLoading(payload, octokit);
@@ -57,7 +63,7 @@ async function setupRepositoryLocally(payload: IssueCommentEvent, installationId
     const destinationPath = getCloneDestinationPath(repoName);
     await clone(repoName, installationId, destinationPath, octokit);
 
-    const prInfo = await getPrInfo(payload, octokit);
+    const prInfo = await getPrInfo(payload.repository.full_name, payload.issue.number, octokit);
     await checkout(destinationPath, prInfo.head.sha);
 }
 
