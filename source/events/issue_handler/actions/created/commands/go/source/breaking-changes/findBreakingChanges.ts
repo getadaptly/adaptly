@@ -23,7 +23,7 @@ export type BreakingChange = {
 const breakingChangesPrompt = `You are a senior software engineer with the task to analyze the changelog of a new version of a package and find breaking changes.
 
 A "breaking change" is an update that:
-- Changes the behavior of an existing function or feature in a way that is not backward-compatible. This could be changes to method signatures, return values, or exception types, etc.
+- Changes the behavior of an existing function or feature in a way that is not backward-compatible.
 - Removes or deprecates an existing function or feature.
 
 Note: Unless explicitly stated in the changelog, assume that the new or modified feature is backward compatible.
