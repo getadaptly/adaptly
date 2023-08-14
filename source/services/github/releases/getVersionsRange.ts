@@ -75,7 +75,7 @@ type Release = {
 };
 
 async function isGitHubVersionPrefixed(repoOwner: string, repoName: string, octokit: Octokit) {
-    const response = await octokit.request(`GET /repos/${repoOwner}/${repoName}/releases?page=${1}&per_page=100`);
+    const response = await octokit.request(`GET /repos/${repoOwner}/${repoName}/releases?page=1&per_page=100`);
     const data = response.data as Release[];
     return data.some((version) => version.tag_name.startsWith('v'));
 }
