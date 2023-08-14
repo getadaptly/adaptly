@@ -1,4 +1,3 @@
-import { IssueCommentEvent } from '@octokit/webhooks-types';
 import { Octokit } from '@octokit/core';
 import { getPrInfo } from '@adaptly/services/github/pulls/getPrInfo';
 import { getManifests } from '@adaptly/services/github/pulls/files';
@@ -7,13 +6,21 @@ import Logger from '@adaptly/logging/logger';
 
 export async function getPackagesDependenciesUpdated(repoFullName: string, prNumber: number, octokit: Octokit): Promise<DependencyUpdate[]> {
     const packagesUpdatedDependencies: DependencyUpdate[] = [];
+    const uniqueBumps = new Set<string>(); // Set to store unique package-version bumps
 
     const prInfo = await getPrInfo(repoFullName, prNumber, octokit);
     const manifests = await getManifests(repoFullName, prNumber, octokit);
 
     for (const manifest of manifests) {
         const dependenciesUpdated = await getDependenciesUpdated(manifest.filename, prInfo, repoFullName, prNumber, octokit);
-        packagesUpdatedDependencies.push(...dependenciesUpdated);
+
+        for (const dep of dependenciesUpdated) {
+            const bumpSignature = `${dep.dependencyName}-${dep.currentVersion}-${dep.targetVersion}`;
+            if (!uniqueBumps.has(bumpSignature)) {
+                uniqueBumps.add(bumpSignature);
+                packagesUpdatedDependencies.push(dep);
+            }
+        }
     }
 
     Logger.info('Updated dependencies', {
