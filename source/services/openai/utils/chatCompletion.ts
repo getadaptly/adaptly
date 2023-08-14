@@ -15,13 +15,16 @@ const retryOperation = retry.operation({
     maxTimeout: 2000
 });
 
-export const chatCompletion = (messages: ChatCompletionRequestMessage[]): Promise<AxiosResponse<CreateChatCompletionResponse, any>> => {
+export const chatCompletion = (
+    messages: ChatCompletionRequestMessage[],
+    model = GPT35_MODEL
+): Promise<AxiosResponse<CreateChatCompletionResponse, any>> => {
     return new Promise((resolve, reject) => {
         retryOperation.attempt(async () => {
             try {
                 const completion = await bottleneck.schedule(() =>
                     openai.createChatCompletion({
-                        model: GPT35_MODEL,
+                        model,
                         temperature: 0.0,
                         messages: messages
                     })

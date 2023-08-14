@@ -8,6 +8,8 @@ import { ADAPTLY_ERRORS } from '@adaptly/errors';
 import { parseJSON } from '@adaptly/utils/json/parseJson';
 import { chatCompletion } from '@adaptly/services/openai/utils/chatCompletion';
 import { getMessageContent } from '@adaptly/services/openai/utils/getMessageContent';
+import { tokenCount } from '@adaptly/services/openai/utils/tokenCount';
+import { GPT35_MODEL, GPT4_MODEL, MAX_NUM_TOKENS_8K } from '@adaptly/services/openai/client';
 
 export type BreakingChanges = {
     cursorVersion: string;
@@ -35,7 +37,8 @@ You task can be broken down into the following steps:
 4. For breaking changes, copy over the title and write a short and concise description of the change. The goal is to provide software engineers with an immediate understanding of the potential impact on their codebase, without overwhelming them with unnecessary details. 
    If possible, provide code refactoring examples using \`\`\`diff \`\`\` syntax showing before and after. 
 
-Avoid explanations and reply with a JSON following this schema:
+Avoid explanations and reply with a JSON following this schema. If it's not possible to determine breaking changes,
+then return "breaking_changes" as empty array "[]".
 
 {
   "type": "object",
@@ -118,8 +121,9 @@ async function extractBreakingChanges(packageName: string, cursorVersion: string
     let completionData: CreateChatCompletionResponse;
 
     try {
+        const firstCheckModel = tokenCount(breakingChangesConversation, GPT4_MODEL) < MAX_NUM_TOKENS_8K ? GPT4_MODEL : GPT35_MODEL;
         // here we need to specify function to have good JSON reply structure
-        const completion = await chatCompletion(breakingChangesConversation);
+        const completion = await chatCompletion(breakingChangesConversation, firstCheckModel);
         Logger.info('ChatGPT: Breaking changes extracted', { packageName, cursorVersion, breakingChanges: completion.data.choices });
         completionData = completion.data;
     } catch (error) {
@@ -134,7 +138,9 @@ async function extractBreakingChanges(packageName: string, cursorVersion: string
             content: `${breakingChangesDoubleCheckPrompt}`
         });
 
-        const completion = await chatCompletion(breakingChangesConversation);
+        const secondCheckModel = tokenCount(breakingChangesConversation, GPT4_MODEL) < MAX_NUM_TOKENS_8K ? GPT4_MODEL : GPT35_MODEL;
+
+        const completion = await chatCompletion(breakingChangesConversation, secondCheckModel);
         Logger.info('Double check ChatGPT: Breaking changes extracted', { packageName, cursorVersion, breakingChanges: completion.data.choices });
         completionData = completion.data;
         breakingChanges = getBreakingChangesFromChatCompletion(completionData);

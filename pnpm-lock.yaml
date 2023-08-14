@@ -17,6 +17,9 @@ dependencies:
   '@babel/preset-typescript':
     specifier: 7.22.5
     version: 7.22.5
+  '@dqbd/tiktoken':
+    specifier: 1.0.7
+    version: 1.0.7
   '@iarna/toml':
     specifier: 2.2.5
     version: 2.2.5
@@ -1479,6 +1482,10 @@ packages:
     dependencies:
       '@cspotcode/source-map-consumer': 0.8.0
     dev: true
+
+  /@dqbd/tiktoken@1.0.7:
+    resolution: {integrity: sha512-bhR5k5W+8GLzysjk8zTMVygQZsgvf7W1F0IlL4ZQ5ugjo5rCyiwGM5d8DYriXspytfu98tv59niang3/T+FoDw==}
+    dev: false
 
   /@iarna/toml@2.2.5:
     resolution: {integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==}
