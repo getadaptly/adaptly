@@ -30,9 +30,10 @@ export const go = async (payload: IssueCommentEvent, installationId: number, oct
         return;
     }
 
-    await setupRepositoryLocally(payload, installationId, octokit);
+    // await setupRepositoryLocally(payload, installationId, octokit);
 
     const breakingChangesReports = await getBreakingChangesReports(updatedDependencies);
+
     Logger.info(`Prepared breaking changes reports`, {
         repository: payload.repository.full_name,
         PR: `#${payload.issue.number}`,
@@ -41,16 +42,21 @@ export const go = async (payload: IssueCommentEvent, installationId: number, oct
 
     await reportBreakingChangesReports(breakingChangesReports, payload, octokit);
 
-    await postRefactorsLoading(payload, octokit);
-    const refactorsReports = await getRefactorsReports(breakingChangesReports, payload);
-    await reportRefactorsReports(refactorsReports, payload, octokit);
+    // await postRefactorsLoading(payload, octokit);
+    // const refactorsReports = await getRefactorsReports(breakingChangesReports, payload);
+    // await reportRefactorsReports(refactorsReports, payload, octokit);
 
     await upsertDatabaseState(
         payload,
-        refactorsReports.map((refactor) => refactor.dependencyUpdate)
+        breakingChangesReports.map((update) => update.dependencyUpdate)
     );
 
-    await deleteRepositoryLocally(payload);
+    // await upsertDatabaseState(
+    //     payload,
+    //     refactorsReports.map((refactor) => refactor.dependencyUpdate)
+    // );
+
+    // await deleteRepositoryLocally(payload);
 };
 
 function allVersionsChecked(updatedDependencies: DependencyUpdate[]): boolean {
