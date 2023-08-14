@@ -21,9 +21,14 @@ export async function getVersionsRange(
         let versionsRange: string[] = [];
 
         const { repoOwner, repoName } = getRepoOwnerAndName(dependecyRepoUrl);
+        const isGitHubPrefixed = await isGitHubVersionPrefixed(repoOwner, repoName, octokit);
 
         const response = await axios.get(`https://registry.npmjs.org/${packageName}`);
-        const versions = Object.keys(response.data.versions);
+        let versions = Object.keys(response.data.versions);
+
+        if (isGitHubPrefixed) {
+            versions = versions.map((version) => `v${version}`);
+        }
 
         for (let version of versions) {
             if (semver.prerelease(version)) {
@@ -62,6 +67,17 @@ export async function getVersionsRange(
     } catch (error) {
         throwGithubReleasesError(error);
     }
+}
+
+type Release = {
+    tag_name: string;
+    prerelease: boolean;
+};
+
+async function isGitHubVersionPrefixed(repoOwner: string, repoName: string, octokit: Octokit) {
+    const response = await octokit.request(`GET /repos/${repoOwner}/${repoName}/releases?page=${1}&per_page=100`);
+    const data = response.data as Release[];
+    return data.some((version) => version.tag_name.startsWith('v'));
 }
 
 const throwGithubReleasesError: ErrorHandler = (error: any, context: any) => {
