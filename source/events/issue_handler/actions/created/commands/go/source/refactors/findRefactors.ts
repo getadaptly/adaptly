@@ -10,7 +10,6 @@ import { BreakingChange } from '../breaking-changes/findBreakingChanges';
 import { parseJSON } from '@adaptly/utils/json/parseJson';
 import { chatCompletion } from '@adaptly/services/openai/utils/chatCompletion';
 import { getMessageContent } from '@adaptly/services/openai/utils/getMessageContent';
-import { GPT4_MODEL, MODEL } from '@adaptly/services/openai/client';
 import { DependencyUpdate } from '../pr-dependencies/getDependenciesUpdated';
 
 const filesAtRiskDirectPrompt = `You are a senior software engineer tasked with evaluating the impact of upgrading a package to its latest version. You will be provided with a source code file that uses the package, and a changelog entry detailing the updates in the new version.
@@ -242,7 +241,7 @@ export async function isFileAffected(packageName: string, breakingChange: Breaki
             content: isIndirectFile(file) ? filesAtRiskIndirectConfirmationPrompt : filesAtRiskDirectConfirmationPrompt
         });
 
-        const doubleCheckCompletion = await chatCompletion(filesAtRiskConversation, GPT4_MODEL);
+        const doubleCheckCompletion = await chatCompletion(filesAtRiskConversation);
         doubleCheckCompletionData = doubleCheckCompletion.data;
     } catch (error) {
         throwOpenAiError(error, filesAtRiskConversation);
@@ -308,7 +307,7 @@ async function askChatGptRefactors(packageName: string, breakingChange: Breaking
     let completionData: CreateChatCompletionResponse;
 
     try {
-        const completion = await chatCompletion(filesAtRiskConversation, MODEL);
+        const completion = await chatCompletion(filesAtRiskConversation);
         completionData = completion.data;
     } catch (error) {
         throwOpenAiError(error, filesAtRiskConversation);
