@@ -37,7 +37,9 @@ export async function getVersionsRange(
             if (isCurrentVersion || isBetween || isTargetVersion) {
                 try {
                     // note(Lauris): npm registry returned versions that are not in github releases
-                    await octokit.request(`GET /repos/${repoOwner}/${repoName}/releases/tags/${version}`);
+                    if (isBetween) {
+                        await octokit.request(`GET /repos/${repoOwner}/${repoName}/releases/tags/${version}`);
+                    }
                     versionsRange.push(version);
                 } catch (error) {
                     continue;
