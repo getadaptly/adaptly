@@ -56,9 +56,6 @@ dependencies:
   fast-glob:
     specifier: 3.3.0
     version: 3.3.0
-  gpt-3-encoder:
-    specifier: 1.1.4
-    version: 1.1.4
   jsonwebtoken:
     specifier: ^9.0.0
     version: 9.0.0
@@ -3447,10 +3444,6 @@ packages:
       to-readable-stream: 1.0.0
       url-parse-lax: 3.0.0
     dev: true
-
-  /gpt-3-encoder@1.1.4:
-    resolution: {integrity: sha512-fSQRePV+HUAhCn7+7HL7lNIXNm6eaFWFbNLOOGtmSJ0qJycyQvj60OvRlH7mee8xAMjBDNRdMXlMwjAbMTDjkg==}
-    dev: false
 
   /graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
