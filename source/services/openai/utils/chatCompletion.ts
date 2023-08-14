@@ -1,7 +1,7 @@
 import Bottleneck from 'bottleneck';
 import { ChatCompletionRequestMessage, CreateChatCompletionResponse } from 'openai';
 import retry from 'retry';
-import { openai, GPT3_MODEL } from '@adaptly/services/openai/client';
+import { openai, GPT35_MODEL } from '@adaptly/services/openai/client';
 import { AxiosResponse } from 'axios';
 
 const bottleneck = new Bottleneck({
@@ -21,7 +21,7 @@ export const chatCompletion = (messages: ChatCompletionRequestMessage[]): Promis
             try {
                 const completion = await bottleneck.schedule(() =>
                     openai.createChatCompletion({
-                        model: GPT3_MODEL,
+                        model: GPT35_MODEL,
                         temperature: 0.0,
                         messages: messages
                     })
