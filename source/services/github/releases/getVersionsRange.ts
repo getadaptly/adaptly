@@ -34,17 +34,14 @@ export async function getVersionsRange(
             const isBetween = semver.gt(version, currentVersion) && semver.lt(version, targetVersion);
             const isTargetVersion = semver.eq(version, targetVersion);
 
-            if (isBetween) {
+            if (isCurrentVersion || isBetween || isTargetVersion) {
                 try {
                     // note(Lauris): npm registry returned versions that are not in github releases
                     await octokit.request(`GET /repos/${repoOwner}/${repoName}/releases/tags/${version}`);
+                    versionsRange.push(version);
                 } catch (error) {
                     continue;
                 }
-            }
-
-            if (isCurrentVersion || isBetween || isTargetVersion) {
-                versionsRange.push(version);
             }
 
             if (isTargetVersion) {
