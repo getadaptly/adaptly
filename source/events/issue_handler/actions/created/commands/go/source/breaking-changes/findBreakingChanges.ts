@@ -2,13 +2,14 @@ import { getChangelog } from '@adaptly/services/adaptly/changelogHunter';
 import Logger, { getMessage } from '@adaptly/logging/logger';
 import { ChatCompletionRequestMessage, CreateChatCompletionResponse } from 'openai';
 import { DependencyUpdate } from '@adaptly/events/issue_handler/actions/created/commands/go/source/pr-dependencies/getDependenciesUpdated';
-import { GPT4_MODEL } from '@adaptly/services/openai/client';
+import { GPT3_MODEL, GPT4_MODEL } from '@adaptly/services/openai/client';
 import { RoleSystem, RoleUser } from '@adaptly/services/openai/types';
 import { ErrorHandler, OpenAiError } from '@adaptly/errors/types';
 import { ADAPTLY_ERRORS } from '@adaptly/errors';
 import { parseJSON } from '@adaptly/utils/json/parseJson';
 import { chatCompletion } from '@adaptly/services/openai/utils/chatCompletion';
 import { getMessageContent } from '@adaptly/services/openai/utils/getMessageContent';
+import { fitsInGPT4 } from '@adaptly/services/openai/utils/fitsInGPT4';
 
 export type BreakingChanges = {
     cursorVersion: string;
@@ -119,8 +120,9 @@ async function extractBreakingChanges(packageName: string, cursorVersion: string
     let completionData: CreateChatCompletionResponse;
 
     try {
+        const firstCheckModel = fitsInGPT4(breakingChangesConversation.map((message) => message.content).join(' ')) ? GPT4_MODEL : GPT3_MODEL;
         // here we need to specify function to have good JSON reply structure
-        const completion = await chatCompletion(breakingChangesConversation, GPT4_MODEL);
+        const completion = await chatCompletion(breakingChangesConversation, firstCheckModel);
         Logger.info('ChatGPT: Breaking changes extracted', { packageName, cursorVersion, breakingChanges: completion.data.choices });
         completionData = completion.data;
     } catch (error) {
@@ -135,7 +137,8 @@ async function extractBreakingChanges(packageName: string, cursorVersion: string
             content: `${breakingChangesDoubleCheckPrompt}`
         });
 
-        const completion = await chatCompletion(breakingChangesConversation, GPT4_MODEL);
+        const secondCheckModel = fitsInGPT4(breakingChangesConversation.map((message) => message.content).join(' ')) ? GPT4_MODEL : GPT3_MODEL;
+        const completion = await chatCompletion(breakingChangesConversation, secondCheckModel);
         Logger.info('Double check ChatGPT: Breaking changes extracted', { packageName, cursorVersion, breakingChanges: completion.data.choices });
         completionData = completion.data;
         breakingChanges = getBreakingChangesFromChatCompletion(completionData);
