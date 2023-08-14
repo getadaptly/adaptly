@@ -1,7 +1,7 @@
 import Bottleneck from 'bottleneck';
 import { ChatCompletionRequestMessage, CreateChatCompletionResponse } from 'openai';
 import retry from 'retry';
-import { openai, GPT_3MODEL, GPT4_MODEL, MAX_NUM_TOKENS_8K, MAX_NUM_TOKENS_16K } from '@adaptly/services/openai/client';
+import { openai, GPT3_MODEL, GPT4_MODEL, MAX_NUM_TOKENS_8K, MAX_NUM_TOKENS_16K } from '@adaptly/services/openai/client';
 import { AxiosResponse } from 'axios';
 
 const bottleneck = new Bottleneck({
@@ -17,7 +17,7 @@ const retryOperation = retry.operation({
 
 export const chatCompletion = (
     messages: ChatCompletionRequestMessage[],
-    model: string = GPT_3MODEL
+    model: string = GPT3_MODEL
 ): Promise<AxiosResponse<CreateChatCompletionResponse, any>> => {
     return new Promise((resolve, reject) => {
         retryOperation.attempt(async () => {
