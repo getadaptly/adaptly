@@ -65,6 +65,13 @@ Avoid explanations and reply with a JSON following this schema:
 export async function findBreakingChanges(dependencyUpdate: DependencyUpdate): Promise<BreakingChanges> {
     let cursorVersion: string | undefined = moveCursorVersion(dependencyUpdate);
 
+    if (dependencyUpdate.dependencyName.startsWith('@types/')) {
+        return {
+            cursorVersion: dependencyUpdate.targetVersion,
+            changes: []
+        };
+    }
+
     while (cursorVersion) {
         const breakingChanges = await extractBreakingChanges(dependencyUpdate.dependencyName, cursorVersion, dependencyUpdate.dependencyRepoUrl);
 
