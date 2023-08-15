@@ -10,6 +10,7 @@ import { chatCompletion } from '@adaptly/services/openai/utils/chatCompletion';
 import { getMessageContent } from '@adaptly/services/openai/utils/getMessageContent';
 import { tokenCount } from '@adaptly/services/openai/utils/tokenCount';
 import { GPT35_MODEL, GPT4_MODEL, MAX_NUM_TOKENS_8K } from '@adaptly/services/openai/client';
+import { getConversationContents } from '@adaptly/services/openai/utils/getConversationContents';
 
 export type BreakingChanges = {
     cursorVersion: string;
@@ -121,7 +122,8 @@ async function extractBreakingChanges(packageName: string, cursorVersion: string
     let completionData: CreateChatCompletionResponse;
 
     try {
-        const firstCheckModel = tokenCount(breakingChangesConversation, GPT4_MODEL) < MAX_NUM_TOKENS_8K ? GPT4_MODEL : GPT35_MODEL;
+        const conversationContents = getConversationContents(breakingChangesConversation);
+        const firstCheckModel = tokenCount([...conversationContents, changelog], GPT4_MODEL) < MAX_NUM_TOKENS_8K ? GPT4_MODEL : GPT35_MODEL;
         // here we need to specify function to have good JSON reply structure
         const completion = await chatCompletion(breakingChangesConversation, firstCheckModel);
         Logger.info('ChatGPT: Breaking changes extracted', { packageName, cursorVersion, breakingChanges: completion.data.choices });
@@ -133,12 +135,20 @@ async function extractBreakingChanges(packageName: string, cursorVersion: string
     let breakingChanges = getBreakingChangesFromChatCompletion(completionData);
 
     if (breakingChanges.length > 0) {
+        const modelMessage = completionData.choices[0].message;
+
+        if (modelMessage) {
+            breakingChangesConversation.push(modelMessage);
+        }
+
         breakingChangesConversation.push({
             role: RoleSystem,
             content: `${breakingChangesDoubleCheckPrompt}`
         });
 
-        const secondCheckModel = tokenCount(breakingChangesConversation, GPT4_MODEL) < MAX_NUM_TOKENS_8K ? GPT4_MODEL : GPT35_MODEL;
+        const nextConversationContents = getConversationContents(breakingChangesConversation);
+        const secondCheckModel =
+            tokenCount([...nextConversationContents, JSON.stringify(completionData)], GPT4_MODEL) < MAX_NUM_TOKENS_8K ? GPT4_MODEL : GPT35_MODEL;
 
         const completion = await chatCompletion(breakingChangesConversation, secondCheckModel);
         Logger.info('Double check ChatGPT: Breaking changes extracted', { packageName, cursorVersion, breakingChanges: completion.data.choices });
