@@ -44,7 +44,7 @@ export const getChangelog = async (githubRepoUrl: string, targetVersion: string,
         const releaseNotes = await getChangelogMd(githubRepoUrl, targetVersion, octokit);
         return releaseNotes;
     } catch (error) {
-        Logger.info(`getChangelog: Could not fetch ${packageName} release notes`);
+        Logger.info(`getChangelog: Could not fetch ${packageName} changelog file`);
     }
 
     // note(Lauris): above should cover 99% of cases and if there is an edge case ignore it for now.
