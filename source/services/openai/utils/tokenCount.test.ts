@@ -1,4 +1,5 @@
 import { RoleSystem } from '../types';
+import { getConversationContents } from './getConversationContents';
 import { tokenCount } from './tokenCount';
 import { ChatCompletionRequestMessage } from 'openai';
 
@@ -19,7 +20,8 @@ describe('tokenCount', () => {
             }
         ];
 
-        const result = tokenCount(conversation, 'gpt-3.5-turbo-16k-0613');
+        const conversationContents = getConversationContents(conversation);
+        const result = tokenCount(conversationContents, 'gpt-3.5-turbo-16k-0613');
 
         // Replace with expected token count for the given conversation and model
         const expectedTokenCount = conversation.reduce((acc, message) => acc + message.tokenCount, 0);
@@ -43,7 +45,8 @@ describe('tokenCount', () => {
             }
         ];
 
-        const result = tokenCount(conversation, 'gpt-4-0613');
+        const conversationContents = getConversationContents(conversation);
+        const result = tokenCount(conversationContents, 'gpt-4-0613');
 
         // Replace with expected token count for the given conversation and model
         const expectedTokenCount = conversation.reduce((acc, message) => acc + message.tokenCount, 0);
