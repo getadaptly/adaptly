@@ -71,6 +71,8 @@ async function getBreakingChangesMessage(dependencyUpdate: DependencyUpdate, bre
         message += '\n\n</details>\n';
     } else {
         message = `:white_check_mark:&nbsp;&nbsp;No breaking changes found.\n\n`;
+        const releaseUrl = await getReleaseUrl(dependencyUpdate.dependencyRepoUrl, dependencyUpdate.cursorVersion);
+        message += `Package: [${dependencyUpdate.dependencyName}](${dependencyUpdate.dependencyUrl})\nVersion: [${dependencyUpdate.cursorVersion}](${releaseUrl})\n\n`;
     }
     message += getProgressMessage(dependencyUpdate);
 

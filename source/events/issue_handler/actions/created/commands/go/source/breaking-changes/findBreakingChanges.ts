@@ -11,6 +11,7 @@ import { getMessageContent } from '@adaptly/services/openai/utils/getMessageCont
 import { tokenCount } from '@adaptly/services/openai/utils/tokenCount';
 import { GPT35_MODEL, GPT4_MODEL, MAX_NUM_TOKENS_8K } from '@adaptly/services/openai/client';
 import { getConversationContents } from '@adaptly/services/openai/utils/getConversationContents';
+import { Octokit } from '@octokit/core';
 
 export type BreakingChanges = {
     cursorVersion: string;
@@ -71,18 +72,28 @@ const breakingChangesDoubleCheckPrompt = `Please review your analysis, paying cl
 - For each breaking change found, double check that is fits the provided definition of "breaking change". If it doesn't, remove it from the list.
 - For each entry, confirm that the titles and descriptions are clear, concise, and would provide software engineers with an immediate understanding of the impact to their code and how to mitigate it.`;
 
-export async function findBreakingChanges(dependencyUpdate: DependencyUpdate): Promise<BreakingChanges> {
+export async function findBreakingChanges(dependencyUpdate: DependencyUpdate, octokit: Octokit): Promise<BreakingChanges> {
     let cursorVersion: string | undefined = moveCursorVersion(dependencyUpdate);
 
     if (dependencyUpdate.dependencyName.startsWith('@types/')) {
         return {
-            cursorVersion: dependencyUpdate.targetVersion,
-            changes: []
+            cursorVersion: dependencyUpdate.cursorVersion,
+            changes: [
+                {
+                    title: 'Adaptly ignores Type updates',
+                    description: 'Types have no clear source of change logs so Adaptly does not check Type updates'
+                }
+            ]
         };
     }
 
     while (cursorVersion) {
-        const breakingChanges = await extractBreakingChanges(dependencyUpdate.dependencyName, cursorVersion, dependencyUpdate.dependencyRepoUrl);
+        const breakingChanges = await extractBreakingChanges(
+            dependencyUpdate.dependencyName,
+            cursorVersion,
+            dependencyUpdate.dependencyRepoUrl,
+            octokit
+        );
 
         if (breakingChanges.length) {
             return {
@@ -100,7 +111,12 @@ export async function findBreakingChanges(dependencyUpdate: DependencyUpdate): P
     };
 }
 
-async function extractBreakingChanges(packageName: string, cursorVersion: string, dependecyRepoUrl: string): Promise<BreakingChange[]> {
+async function extractBreakingChanges(
+    packageName: string,
+    cursorVersion: string,
+    dependecyRepoUrl: string,
+    octokit: Octokit
+): Promise<BreakingChange[]> {
     const breakingChangesConversation: ChatCompletionRequestMessage[] = [];
 
     breakingChangesConversation.push({
@@ -108,7 +124,7 @@ async function extractBreakingChanges(packageName: string, cursorVersion: string
         content: `${breakingChangesPrompt}`
     });
 
-    const changelog = await getChangelog(dependecyRepoUrl, cursorVersion);
+    const changelog = await getChangelog(dependecyRepoUrl, cursorVersion, packageName, octokit);
 
     breakingChangesConversation.push({
         role: RoleUser,

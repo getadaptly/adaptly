@@ -6,13 +6,51 @@ import Logger, { getMessage } from '@adaptly/logging/logger';
 import { GITHUB_API_URL } from '@adaptly/consts';
 import { ErrorHandler, GithubError } from '@adaptly/errors/types';
 import { ADAPTLY_ERRORS } from '@adaptly/errors';
+import { getFileContent } from '../github/contents/getContentFile';
+import { Octokit } from '@octokit/core';
+import { extractVersionChanges } from './extractVersionChanges';
 
-export const getChangelog = async (githubRepoUrl: string, targetVersion: string): Promise<string> => {
+export const getChangelog = async (githubRepoUrl: string, targetVersion: string, packageName: string, octokit: Octokit): Promise<string> => {
     const accessToken = getEnv('GITHUB_ACCESS_TOKEN');
 
-    const releaseNotes = await getReleaseNotes(githubRepoUrl, accessToken, targetVersion);
+    // note(Lauris): We need to try every possible way to fetch release notes because even if some of the version is
+    // prefixed with, for example, 'v', then it might be that some other is not. If all versions are prefixed, then they will come in already
+    // formatted with the prefix, so the first try below will succeed.
+    try {
+        const releaseNotes = await getReleaseNotes(githubRepoUrl, accessToken, targetVersion);
+        return releaseNotes;
+    } catch (error) {
+        Logger.info(`getChangelog: Could not fetch release notes for version: ${targetVersion}`);
+    }
 
-    return releaseNotes;
+    try {
+        Logger.info('getChangelog: Trying to fetch with v prefix');
+        const releaseNotes = await getReleaseNotesWithPrefix(githubRepoUrl, accessToken, targetVersion, 'v');
+        return releaseNotes;
+    } catch (error) {
+        Logger.info(`getChangelog: Could not fetch release notes for version with v prefix v${targetVersion}`);
+    }
+
+    try {
+        Logger.info('getChangelog: Trying to fetch with package name prefix');
+        const releaseNotes = await getReleaseNotesWithPrefix(githubRepoUrl, accessToken, targetVersion, `${packageName}@`);
+        return releaseNotes;
+    } catch (error) {
+        Logger.info(`getChangelog: Could not fetch release notes for version with package name prefix ${packageName}@${targetVersion}`);
+    }
+
+    try {
+        Logger.info('getChangelog: Trying to fetch changelog file');
+        const releaseNotes = await getChangelogMd(githubRepoUrl, targetVersion, octokit);
+        return releaseNotes;
+    } catch (error) {
+        Logger.info(`getChangelog: Could not fetch ${packageName} changelog file`);
+    }
+
+    // note(Lauris): above should cover 99% of cases and if there is an edge case ignore it for now.
+    // instead of crashing.
+    Logger.info('getChangelog: could not retrieve changelog. Returning default changelog: everything looks fine');
+    return 'Nothing has been changed. Everything will work perfectly';
 };
 
 const getReleaseNotes = async (githubRepoUrl: string, accessToken: string, targetVersion: string): Promise<string> => {
@@ -26,6 +64,55 @@ const getReleaseNotes = async (githubRepoUrl: string, accessToken: string, targe
 
     return response.data.body;
 };
+
+const getReleaseNotesWithPrefix = async (githubRepoUrl: string, accessToken: string, targetVersion: string, prefix: string): Promise<string> => {
+    Logger.info(`Looking for release notes in ${githubRepoUrl} for ${targetVersion}`);
+
+    const { repoOwner, repoName } = getRepoOwnerAndName(githubRepoUrl);
+
+    const releaseUrl = `${GITHUB_API_URL}/repos/${repoOwner}/${repoName}/releases/tags/${prefix}${targetVersion}`;
+
+    const response: AxiosResponse = await fetchReleaseNotes(releaseUrl, accessToken);
+
+    return response.data.body;
+};
+
+async function getChangelogMd(githubRepoUrl: string, targetVersion: string, octokit: Octokit): Promise<string> {
+    const { repoOwner, repoName } = getRepoOwnerAndName(githubRepoUrl);
+
+    try {
+        const content = await getFileContent(`${repoOwner}/${repoName}`, 'CHANGELOG.md', octokit);
+        const versionChanges = extractVersionChanges(content, targetVersion);
+        return versionChanges;
+    } catch (error) {
+        Logger.info("Couldn't find CHANGELOG.md");
+    }
+
+    try {
+        const content = await getFileContent(`${repoOwner}/${repoName}`, 'changelog.md', octokit);
+        const versionChanges = extractVersionChanges(content, targetVersion);
+        return versionChanges;
+    } catch (error) {
+        Logger.info("Couldn't find changelog.md");
+    }
+
+    try {
+        const content = await getFileContent(`${repoOwner}/${repoName}`, 'CHANGES.md', octokit);
+        const versionChanges = extractVersionChanges(content, targetVersion);
+        return versionChanges;
+    } catch (error) {
+        Logger.info("Couldn't find CHANGES.md");
+    }
+
+    try {
+        const content = await getFileContent(`${repoOwner}/${repoName}`, 'changes.md', octokit);
+        const versionChanges = extractVersionChanges(content, targetVersion);
+        return versionChanges;
+    } catch (error) {
+        Logger.info("Couldn't find changes.md");
+        throw error;
+    }
+}
 
 export function getRepoOwnerAndName(githubRepoUrl: string): { repoOwner: string; repoName: string } {
     const parsedUrl = new URL(githubRepoUrl);

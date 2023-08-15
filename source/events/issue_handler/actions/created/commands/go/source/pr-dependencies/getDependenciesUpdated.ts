@@ -56,7 +56,7 @@ export async function getDependenciesUpdated(
 
                 const dependencyRepoUrl = await parser.getDependencyRepoUrl(dependency);
                 const dependencyUrl = parser.getDependencyUrl(dependency);
-                const versionsRange = await getVersionsRange(
+                const { versionsRange, prefix } = await getVersionsRange(
                     dependency,
                     dependencyRepoUrl,
                     dependenciesBase[dependency],
@@ -64,12 +64,9 @@ export async function getDependenciesUpdated(
                     octokit
                 );
 
-                const isVersionPrefixed = versionsRange.some((version) => version.startsWith('v'));
-
-                const currentVersionFormatted = isVersionPrefixed ? formatVersion(currentVersion) : currentVersion;
-                const cursorVersionFormatted = isVersionPrefixed ? formatVersion(cursorVersion) : cursorVersion;
-                const targetVersionFormatted = isVersionPrefixed ? formatVersion(targetVersion) : targetVersion;
-                const versionsRangeFormatted = isVersionPrefixed ? formatVersions(versionsRange) : versionsRange;
+                const currentVersionFormatted = prefix ? formatVersion(currentVersion, prefix) : currentVersion;
+                const cursorVersionFormatted = prefix ? formatVersion(cursorVersion, prefix) : cursorVersion;
+                const targetVersionFormatted = prefix ? formatVersion(targetVersion, prefix) : targetVersion;
 
                 updatedDependencies.push({
                     dependencyName: dependency,
@@ -78,7 +75,7 @@ export async function getDependenciesUpdated(
                     currentVersion: currentVersionFormatted,
                     cursorVersion: cursorVersionFormatted,
                     targetVersion: targetVersionFormatted,
-                    intermediaryVersions: versionsRangeFormatted,
+                    intermediaryVersions: versionsRange,
                     dirName: getPackageDirectory(manifestFilename),
                     manifestFilename
                 });
@@ -89,12 +86,8 @@ export async function getDependenciesUpdated(
     return updatedDependencies;
 }
 
-function formatVersions(versions: string[]): string[] {
-    return versions.map((version) => formatVersion(version));
-}
-
-function formatVersion(version: string): string {
-    return version.startsWith('v') ? version : `v${version}`;
+function formatVersion(version: string, prefix: string): string {
+    return version.startsWith(prefix) ? version : `${prefix}${version}`;
 }
 
 function getPackageDirectory(manifestFilename: string): string {
