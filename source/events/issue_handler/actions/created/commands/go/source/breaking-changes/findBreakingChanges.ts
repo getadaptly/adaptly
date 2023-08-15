@@ -108,7 +108,7 @@ async function extractBreakingChanges(packageName: string, cursorVersion: string
         content: `${breakingChangesPrompt}`
     });
 
-    const changelog = await getChangelog(dependecyRepoUrl, cursorVersion);
+    const changelog = await getChangelog(dependecyRepoUrl, cursorVersion, packageName);
 
     breakingChangesConversation.push({
         role: RoleUser,

@@ -7,11 +7,17 @@ import { GITHUB_API_URL } from '@adaptly/consts';
 import { ErrorHandler, GithubError } from '@adaptly/errors/types';
 import { ADAPTLY_ERRORS } from '@adaptly/errors';
 
-export const getChangelog = async (githubRepoUrl: string, targetVersion: string): Promise<string> => {
+export const getChangelog = async (githubRepoUrl: string, targetVersion: string, packageName: string): Promise<string> => {
     const accessToken = getEnv('GITHUB_ACCESS_TOKEN');
 
-    const releaseNotes = await getReleaseNotes(githubRepoUrl, accessToken, targetVersion);
+    try {
+        const releaseNotes = await getReleaseNotes(githubRepoUrl, accessToken, targetVersion);
+        return releaseNotes;
+    } catch (error) {
+        Logger.info('Could not catch release notes for version, trying to get release notes with package name in version');
+    }
 
+    const releaseNotes = await getReleaseNotesPackageNameInVersion(githubRepoUrl, accessToken, targetVersion, packageName);
     return releaseNotes;
 };
 
@@ -21,6 +27,23 @@ const getReleaseNotes = async (githubRepoUrl: string, accessToken: string, targe
     const { repoOwner, repoName } = getRepoOwnerAndName(githubRepoUrl);
 
     const releaseUrl = `${GITHUB_API_URL}/repos/${repoOwner}/${repoName}/releases/tags/${targetVersion}`;
+
+    const response: AxiosResponse = await fetchReleaseNotes(releaseUrl, accessToken);
+
+    return response.data.body;
+};
+
+const getReleaseNotesPackageNameInVersion = async (
+    githubRepoUrl: string,
+    accessToken: string,
+    targetVersion: string,
+    packageName: string
+): Promise<string> => {
+    Logger.info(`Looking for release notes in ${githubRepoUrl} for ${targetVersion}`);
+
+    const { repoOwner, repoName } = getRepoOwnerAndName(githubRepoUrl);
+
+    const releaseUrl = `${GITHUB_API_URL}/repos/${repoOwner}/${repoName}/releases/tags/${packageName}@${targetVersion}`;
 
     const response: AxiosResponse = await fetchReleaseNotes(releaseUrl, accessToken);
 
