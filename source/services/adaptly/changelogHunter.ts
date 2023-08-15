@@ -14,11 +14,25 @@ export const getChangelog = async (githubRepoUrl: string, targetVersion: string,
         const releaseNotes = await getReleaseNotes(githubRepoUrl, accessToken, targetVersion);
         return releaseNotes;
     } catch (error) {
-        Logger.info('Could not catch release notes for version, trying to get release notes with package name in version');
+        Logger.info(`getChangelog: Could not catch release notes for version: ${targetVersion}`);
     }
 
-    const releaseNotes = await getReleaseNotesPackageNameInVersion(githubRepoUrl, accessToken, targetVersion, packageName);
-    return releaseNotes;
+    try {
+        Logger.info('getChangelog: Trying to fetch with v prefix');
+        const releaseNotes = await getReleaseNotesWithPrefix(githubRepoUrl, accessToken, targetVersion, 'v');
+        return releaseNotes;
+    } catch (error) {
+        Logger.info(`getChangelog: Could not catch release notes for version with v prefix v${targetVersion}`);
+    }
+
+    try {
+        Logger.info('getChangelog: Trying to fetch with package name prefix');
+        const releaseNotes = await getReleaseNotesWithPrefix(githubRepoUrl, accessToken, targetVersion, `${packageName}@`);
+        return releaseNotes;
+    } catch (error) {
+        Logger.info(`getChangelog: Could not catch release notes for version with package name prefix ${packageName}@${targetVersion}`);
+        throw error;
+    }
 };
 
 const getReleaseNotes = async (githubRepoUrl: string, accessToken: string, targetVersion: string): Promise<string> => {
@@ -33,17 +47,12 @@ const getReleaseNotes = async (githubRepoUrl: string, accessToken: string, targe
     return response.data.body;
 };
 
-const getReleaseNotesPackageNameInVersion = async (
-    githubRepoUrl: string,
-    accessToken: string,
-    targetVersion: string,
-    packageName: string
-): Promise<string> => {
+const getReleaseNotesWithPrefix = async (githubRepoUrl: string, accessToken: string, targetVersion: string, prefix: string): Promise<string> => {
     Logger.info(`Looking for release notes in ${githubRepoUrl} for ${targetVersion}`);
 
     const { repoOwner, repoName } = getRepoOwnerAndName(githubRepoUrl);
 
-    const releaseUrl = `${GITHUB_API_URL}/repos/${repoOwner}/${repoName}/releases/tags/${packageName}@${targetVersion}`;
+    const releaseUrl = `${GITHUB_API_URL}/repos/${repoOwner}/${repoName}/releases/tags/${prefix}${targetVersion}`;
 
     const response: AxiosResponse = await fetchReleaseNotes(releaseUrl, accessToken);
 
