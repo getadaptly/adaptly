@@ -18,7 +18,7 @@
         "migrate:dev": "doppler run -- pnpm prisma migrate dev",
         "migrate:deploy": "doppler run -- pnpm prisma migrate deploy",
         "start": "pnpm migrate:deploy && doppler run -- node ./build/server.js",
-        "test": "doppler run -- jest --testPathIgnorePatterns eval/",
+        "test": "jest --testPathIgnorePatterns eval/",
         "eval-ts": "doppler run -- jest eval/isFileAffected.typescript.test.ts",
         "eval-py": "doppler run -- jest eval/isFileAffected.python.test.ts",
         "prisma-studio": "doppler run -- prisma studio",

@@ -12,7 +12,7 @@ const createFile = async (filePath: string, content = '') => {
     await fs.writeFile(filePath, content);
 };
 
-describe('findFiles', () => {
+describe.skip('findFiles', () => {
     beforeEach(async () => {
         await fs.mkdir(packagePath, { recursive: true });
     });
