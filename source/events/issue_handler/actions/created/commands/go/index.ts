@@ -32,7 +32,7 @@ export const go = async (payload: IssueCommentEvent, installationId: number, oct
 
     // await setupRepositoryLocally(payload, installationId, octokit);
 
-    const breakingChangesReports = await getBreakingChangesReports(updatedDependencies);
+    const breakingChangesReports = await getBreakingChangesReports(updatedDependencies, octokit);
 
     Logger.info(`Prepared breaking changes reports`, {
         repository: payload.repository.full_name,

@@ -61,7 +61,7 @@ type Verdict = {
 
 async function getVerdict(repoNameWithOwner: string, prNumber: number, octokit: Octokit): Promise<Verdict> {
     const updatedDependencies = await getPackagesDependenciesUpdated(repoNameWithOwner, prNumber, octokit);
-    const breakingChangesReports = await getBreakingChangesReports(updatedDependencies);
+    const breakingChangesReports = await getBreakingChangesReports(updatedDependencies, octokit);
 
     const reachedTargetVersion = breakingChangesReports.every(
         (report) => report.dependencyUpdate.cursorVersion === report.dependencyUpdate.targetVersion
