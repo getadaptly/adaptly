@@ -56,7 +56,7 @@ export async function getDependenciesUpdated(
 
                 const dependencyRepoUrl = await parser.getDependencyRepoUrl(dependency);
                 const dependencyUrl = parser.getDependencyUrl(dependency);
-                const versionsRange = await getVersionsRange(
+                const { versionsRange, prefix } = await getVersionsRange(
                     dependency,
                     dependencyRepoUrl,
                     dependenciesBase[dependency],
@@ -64,12 +64,9 @@ export async function getDependenciesUpdated(
                     octokit
                 );
 
-                const prefix = getPrefix(versionsRange, dependency);
-
                 const currentVersionFormatted = prefix ? formatVersion(currentVersion, prefix) : currentVersion;
                 const cursorVersionFormatted = prefix ? formatVersion(cursorVersion, prefix) : cursorVersion;
                 const targetVersionFormatted = prefix ? formatVersion(targetVersion, prefix) : targetVersion;
-                const versionsRangeFormatted = prefix ? formatVersions(versionsRange, prefix) : versionsRange;
 
                 updatedDependencies.push({
                     dependencyName: dependency,
@@ -78,7 +75,7 @@ export async function getDependenciesUpdated(
                     currentVersion: currentVersionFormatted,
                     cursorVersion: cursorVersionFormatted,
                     targetVersion: targetVersionFormatted,
-                    intermediaryVersions: versionsRangeFormatted,
+                    intermediaryVersions: versionsRange,
                     dirName: getPackageDirectory(manifestFilename),
                     manifestFilename
                 });
@@ -87,25 +84,6 @@ export async function getDependenciesUpdated(
     }
 
     return updatedDependencies;
-}
-
-function getPrefix(versionsRange: string[], dependency: string): string | undefined {
-    const isVersionPrefixedV = versionsRange.every((version) => version.startsWith('v'));
-    const isVersionPrefixedPackage = versionsRange.every((version) => version.startsWith(`${dependency}@`));
-
-    if (isVersionPrefixedV) {
-        return 'v';
-    }
-
-    if (isVersionPrefixedPackage) {
-        return `${dependency}@`;
-    }
-
-    return undefined;
-}
-
-function formatVersions(versions: string[], prefix: string): string[] {
-    return versions.map((version) => formatVersion(version, prefix));
 }
 
 function formatVersion(version: string, prefix: string): string {

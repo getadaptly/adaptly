@@ -13,6 +13,9 @@ import { extractVersionChanges } from './extractVersionChanges';
 export const getChangelog = async (githubRepoUrl: string, targetVersion: string, packageName: string, octokit: Octokit): Promise<string> => {
     const accessToken = getEnv('GITHUB_ACCESS_TOKEN');
 
+    // note(Lauris): We need to try every possible way to fetch release notes because even if some of the version is
+    // prefixed with, for example, 'v', then it might be that some other is not. If all versions are prefixed, then they will come in already
+    // formatted with the prefix, so the first try below will succeed.
     try {
         const releaseNotes = await getReleaseNotes(githubRepoUrl, accessToken, targetVersion);
         return releaseNotes;
