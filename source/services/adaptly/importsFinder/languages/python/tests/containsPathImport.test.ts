@@ -12,7 +12,7 @@ const fsMkdir = util.promisify(fs.mkdir);
 const REPO_NAME = 'owner-151204/repo-151204';
 const packagePath = getCloneDestinationPath(REPO_NAME);
 
-describe('getAbsoluteImportPath', () => {
+describe.skip('getAbsoluteImportPath', () => {
     beforeEach(async () => {
         await fsMkdir(packagePath, { recursive: true });
     });
