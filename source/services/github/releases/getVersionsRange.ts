@@ -5,6 +5,7 @@ import { ADAPTLY_ERRORS } from '@adaptly/errors';
 import axios from 'axios';
 import { getRepoOwnerAndName } from '@adaptly/services/adaptly/changelogHunter';
 import { Octokit } from '@octokit/core';
+import { NPM_API_URL } from '@adaptly/consts';
 
 // note(Lauris): with range is meant:
 // Including currentVersion, all versions between
@@ -23,7 +24,7 @@ export async function getVersionsRange(
         const { repoOwner, repoName } = getRepoOwnerAndName(dependecyRepoUrl);
         const isGitHubPrefixed = await isGitHubVersionPrefixed(repoOwner, repoName, octokit);
 
-        const response = await axios.get(`https://registry.npmjs.org/${packageName}`);
+        const response = await axios.get(`${NPM_API_URL}/${packageName}`);
         let versions = Object.keys(response.data.versions);
 
         if (isGitHubPrefixed) {
