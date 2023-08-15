@@ -5,6 +5,6 @@ module.exports = {
     preset: 'ts-jest',
     testEnvironment: 'node',
     moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
-    setupFilesAfterEnv: ['./jest.globalSetup.js'],
+    setupFilesAfterEnv: ['<rootDir>/jest.globalSetup.js'],
     testPathIgnorePatterns: ['node_modules/**/*', 'tmp/**/*']
 };
