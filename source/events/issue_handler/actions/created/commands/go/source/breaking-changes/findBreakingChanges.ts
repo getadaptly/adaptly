@@ -77,8 +77,13 @@ export async function findBreakingChanges(dependencyUpdate: DependencyUpdate, oc
 
     if (dependencyUpdate.dependencyName.startsWith('@types/')) {
         return {
-            cursorVersion: dependencyUpdate.targetVersion,
-            changes: []
+            cursorVersion: dependencyUpdate.cursorVersion,
+            changes: [
+                {
+                    title: 'Adaptly ignores Type updates',
+                    description: 'Types have no clear source of change logs so Adaptly does not check Type updates'
+                }
+            ]
         };
     }
 
