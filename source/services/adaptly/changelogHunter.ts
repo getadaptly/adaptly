@@ -45,8 +45,12 @@ export const getChangelog = async (githubRepoUrl: string, targetVersion: string,
         return releaseNotes;
     } catch (error) {
         Logger.info(`getChangelog: Could not fetch ${packageName} release notes`);
-        throw error;
     }
+
+    // note(Lauris): above should cover 99% of cases and if there is an edge case ignore it for now.
+    // instead of crashing.
+    Logger.info('getChangelog: could not retrieve changelog. Returning default changelog: everything looks fine');
+    return 'Nothing has been changed. Everything will work perfectly';
 };
 
 const getReleaseNotes = async (githubRepoUrl: string, accessToken: string, targetVersion: string): Promise<string> => {

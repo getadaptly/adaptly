@@ -37,12 +37,8 @@ export async function getVersionsRange(
             const isTargetVersion = semver.eq(version, targetVersion);
 
             if (isCurrentVersion || isBetween || isTargetVersion) {
-                // note(Lauris): npm registry returned versions that are not in github releases
-                if (isBetween && (await versionExistsInGithubReleases(repoOwner, repoName, packageName, prefix, version, octokit))) {
-                    versionsRange.push(version);
-                } else {
-                    versionsRange.push(version);
-                }
+                // note(Lauris): npm registry sometimes returns versions that are not in github releases
+                versionsRange.push(version);
             }
 
             if (isTargetVersion) {
@@ -71,41 +67,6 @@ type Release = {
     tag_name: string;
     prerelease: boolean;
 };
-
-async function versionExistsInGithubReleases(
-    repoOwner: string,
-    repoName: string,
-    packageName: string,
-    prefix: string,
-    version: string,
-    octokit: Octokit
-): Promise<boolean> {
-    if (prefix) {
-        try {
-            await octokit.request(`GET /repos/${repoOwner}/${repoName}/releases/tags/${prefix}${version}`);
-            return true;
-        } catch (error) {
-            return false;
-        }
-    }
-
-    try {
-        await octokit.request(`GET /repos/${repoOwner}/${repoName}/releases/tags/${version}`);
-        return true;
-    } catch (error) {}
-
-    try {
-        await octokit.request(`GET /repos/${repoOwner}/${repoName}/releases/tags/v${version}`);
-        return true;
-    } catch (error) {}
-
-    try {
-        await octokit.request(`GET /repos/${repoOwner}/${repoName}/releases/tags/${packageName}@${version}`);
-        return true;
-    } catch (error) {}
-
-    return false;
-}
 
 async function getPrefix(repoOwner: string, repoName: string, dependency: string, octokit: Octokit): Promise<string> {
     const releases: Release[] = [];
