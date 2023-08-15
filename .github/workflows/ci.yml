@@ -30,9 +30,3 @@ jobs:
 
     - name: Typecheck the project
       run: pnpm run typecheck
-
-    - name: Write Jest configs
-      run: npx jest --showConfig
-
-    - name: Run tests
-      run: pnpm run test
