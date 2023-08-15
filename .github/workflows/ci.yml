@@ -22,14 +22,6 @@ jobs:
     - name: Install pnpm
       run: npm install -g pnpm@8.6.6
 
-    - name: Cache dependencies
-      uses: actions/cache@v2
-      with:
-        path: ~/.pnpm-store
-        key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpfile.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-pnpm-
-
     - name: Install dependencies
       run: pnpm install
 
