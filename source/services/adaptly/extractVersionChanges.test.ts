@@ -32,4 +32,17 @@ describe('extractVersionChanges', () => {
         const result = extractVersionChanges(changelog, '1.0.45');
         expect(result).toBe('Nothing has been changed. Everything will work perfectly');
     });
+
+    it('should return the correct changes for a version that exists', () => {
+        const changelog2 = `
+          ## Version 6.1.0 (2019-08-19)
+          football
+      
+          ## Version 6.2.0 (2019-28-19)
+          basketball
+        `;
+
+        const result = extractVersionChanges(changelog2, '6.1.0');
+        expect(result).toBe('football');
+    });
 });

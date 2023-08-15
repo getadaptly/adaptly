@@ -3,7 +3,7 @@ export function extractVersionChanges(changelog: string, version: string): strin
     const lines = changelog.split('\n');
 
     // Find the line index of the specified version
-    const versionIndex = lines.findIndex((line) => line.trim().startsWith('#') && line.trim().endsWith(version));
+    const versionIndex = lines.findIndex((line) => line.trim().startsWith('#') && line.includes(version));
 
     // If the version is not found, return the default message
     if (versionIndex === -1) {
@@ -14,8 +14,7 @@ export function extractVersionChanges(changelog: string, version: string): strin
     const nextHeaderIndex = lines.slice(versionIndex + 1).findIndex((line) => line.trim().startsWith('#'));
     const endIndex = nextHeaderIndex !== -1 ? versionIndex + nextHeaderIndex + 1 : lines.length;
 
-    // Extract the lines between the version header and the next header (or the end of the file)
-    // Extract the lines between the version header and the next header (or the end of the file)
+    // Extract the lines between the version header and the next header (or the end of the file), trimming whitespace from each line
     const changes = lines
         .slice(versionIndex + 1, endIndex)
         .map((line) => line.trim())
