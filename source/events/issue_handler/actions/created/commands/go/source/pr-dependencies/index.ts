@@ -12,15 +12,8 @@ export async function getPackagesDependenciesUpdated(repoFullName: string, prNum
     const manifests = await getManifests(repoFullName, prNumber, octokit);
 
     for (const manifest of manifests) {
-        const dependenciesUpdated = await getDependenciesUpdated(manifest.filename, prInfo, repoFullName, prNumber, octokit);
-
-        for (const dep of dependenciesUpdated) {
-            const bumpSignature = `${dep.dependencyName}-${dep.currentVersion}-${dep.targetVersion}`;
-            if (!uniqueBumps.has(bumpSignature)) {
-                uniqueBumps.add(bumpSignature);
-                packagesUpdatedDependencies.push(dep);
-            }
-        }
+        const dependenciesUpdated = await getDependenciesUpdated(manifest.filename, prInfo, repoFullName, prNumber, uniqueBumps, octokit);
+        packagesUpdatedDependencies.push(...dependenciesUpdated);
     }
 
     Logger.info('Updated dependencies', {
