@@ -55,6 +55,10 @@ async function getBreakingChangesMessage(dependencyUpdate: DependencyUpdate, bre
     if (breakingChanges.length) {
         const releaseUrl = await getReleaseUrl(dependencyUpdate.dependencyRepoUrl, dependencyUpdate.cursorVersion);
 
+        if (dependencyUpdate.dependencyName.startsWith('@types/')) {
+            return `:see_no_evil:&nbsp;&nbsp;Adaptly ignores Type updates.Types have no clear source of change logs so Adaptly does not check Type updates.\n\nPackage: [${dependencyUpdate.dependencyName}](${dependencyUpdate.dependencyUrl})\nVersion: [${dependencyUpdate.cursorVersion}](${releaseUrl})\n`;
+        }
+
         message = `:information_source:&nbsp;&nbsp;Breaking Changes in the Dependency's Changelog. Check breaking changes and run \`/adaptly go\` to continue checking next versions.\n\nPackage: [${dependencyUpdate.dependencyName}](${dependencyUpdate.dependencyUrl})\nVersion: [${dependencyUpdate.cursorVersion}](${releaseUrl})\n`;
 
         let breakingChangeNumber = 1;
