@@ -62,7 +62,13 @@ const getReleaseNotes = async (githubRepoUrl: string, accessToken: string, targe
 
     const response: AxiosResponse = await fetchReleaseNotes(releaseUrl, accessToken);
 
-    return response.data.body;
+    const releaseNotes = response.data.body;
+
+    if (!releaseNotes) {
+        return 'Nothing has been changed. Everything will work perfectly';
+    }
+
+    return releaseNotes;
 };
 
 const getReleaseNotesWithPrefix = async (githubRepoUrl: string, accessToken: string, targetVersion: string, prefix: string): Promise<string> => {
@@ -74,7 +80,13 @@ const getReleaseNotesWithPrefix = async (githubRepoUrl: string, accessToken: str
 
     const response: AxiosResponse = await fetchReleaseNotes(releaseUrl, accessToken);
 
-    return response.data.body;
+    const releaseNotes = response.data.body;
+
+    if (!releaseNotes) {
+        return 'Nothing has been changed. Everything will work perfectly';
+    }
+
+    return releaseNotes;
 };
 
 async function getChangelogMd(githubRepoUrl: string, targetVersion: string, octokit: Octokit): Promise<string> {

@@ -45,7 +45,17 @@ export class PackageJsonParser implements DependenciesParser {
             const response: AxiosResponse = await axios.get(npmApiUrl);
 
             const packageInfo = response.data;
-            const repoUrl = packageInfo.repository.url;
+            const repository = packageInfo.repository;
+
+            let repoUrl = '';
+
+            if (repository) {
+                repoUrl = packageInfo.repository.url;
+            } else {
+                const maintainer = packageInfo.maintainers[0].name;
+                const repoName = `${maintainer}/${packageName}`;
+                repoUrl = `git+https://github.com/${repoName}.git`;
+            }
 
             if (!repoUrl) {
                 throw new Error('No repoUrl');
