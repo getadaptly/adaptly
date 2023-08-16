@@ -26,6 +26,7 @@ export async function getDependenciesUpdated(
     prInfo: PrInfo,
     repoFullName: string,
     prNumber: number,
+    uniqueBumps: Set<string>,
     octokit: Octokit
 ): Promise<DependencyUpdate[]> {
     Logger.info(`Getting dependencies updated for ${repoFullName} in #${prNumber}`);
@@ -52,6 +53,10 @@ export async function getDependenciesUpdated(
                 const cursorVersion = dependencyUpdateInDatabase ? dependencyUpdateInDatabase.cursorVersion : currentVersion;
                 const targetVersion = dependenciesHead[dependency];
 
+                if (isAlreadyScheduled(dependency, currentVersion, targetVersion, uniqueBumps)) {
+                    continue;
+                }
+
                 Logger.info(`Found an update for ${dependency} from ${currentVersion} to ${targetVersion}`);
 
                 const dependencyRepoUrl = await parser.getDependencyRepoUrl(dependency);
@@ -67,6 +72,8 @@ export async function getDependenciesUpdated(
                 const currentVersionFormatted = prefix ? formatVersion(currentVersion, prefix) : currentVersion;
                 const cursorVersionFormatted = prefix ? formatVersion(cursorVersion, prefix) : cursorVersion;
                 const targetVersionFormatted = prefix ? formatVersion(targetVersion, prefix) : targetVersion;
+
+                uniqueBumps.add(`${dependency}-${currentVersionFormatted}-${targetVersionFormatted}`);
 
                 updatedDependencies.push({
                     dependencyName: dependency,
@@ -84,6 +91,18 @@ export async function getDependenciesUpdated(
     }
 
     return updatedDependencies;
+}
+
+function isAlreadyScheduled(dependency: string, currentVersion: string, targetVersion: string, uniqueBumps: Set<string>): boolean {
+    const bumpSignature = `${dependency}-${currentVersion}-${targetVersion}`;
+    const bumpSignatureV = `${dependency}-v${currentVersion}-v${targetVersion}`;
+    const bumpSignatureDependency = `${dependency}-${dependency}@${currentVersion}-${dependency}@${targetVersion}`;
+
+    if (uniqueBumps.has(bumpSignature) || uniqueBumps.has(bumpSignatureV) || uniqueBumps.has(bumpSignatureDependency)) {
+        return true;
+    }
+
+    return false;
 }
 
 function formatVersion(version: string, prefix: string): string {
