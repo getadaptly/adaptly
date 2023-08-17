@@ -24,7 +24,7 @@ export const chatCompletion = (
             try {
                 const completion = await bottleneck.schedule(() =>
                     openai.createChatCompletion({
-                        model,
+                        model: GPT35_MODEL,
                         temperature: 0.0,
                         messages: messages
                     })
