@@ -67,7 +67,7 @@ Adaptly can handle multiple dependency updates within a pull request. If additio
 
 ### Languages supported
 
-<img src="https://github.com/getadaptly/adaptly/assets/42170848/8f897dbf-d768-4e5d-b0d9-6bbda8f24fe6" width="128px">
+<img src="https://github.com/getadaptly/adaptly/assets/42170848/8ccf6a7e-29f9-4482-8c70-e67414a3c758" width="128px">
 
 
 ## Getting started
