@@ -6,7 +6,7 @@ import { postComment } from '@adaptly/services/github/issues/comments/postCommen
 export const help = async (payload: IssueCommentEvent, octokit: Octokit) => {
     Logger.info('/adaptly help invoked', { repository: payload.repository.full_name, PR: `#${payload.issue.number}` });
 
-    const message = `:computer:&nbsp;&nbsp;Adaptly commands.\n\n\`go\` : invoke Adaptly.\n\n\`clear\`: clear comments and return to pre-start state.\n\n\`help\` : show available commands.
+    const message = `:computer:&nbsp;&nbsp;Adaptly commands.\n\n\`go\` : invoke Adaptly.\n\n\`clear\`: clear comments and return to pre-start state.\n\n\`feedback\`: send us feedback on Adaptly.\n\n\`help\` : show available commands.
 `;
 
     await postComment(payload.repository.full_name, payload.issue.number, message, octokit);
