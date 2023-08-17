@@ -25,7 +25,13 @@ export const go = async (payload: IssueCommentEvent, installationId: number, oct
     await postBreakingChangesLoading(payload, octokit);
 
     const updatedDependencies = await getPackagesDependenciesUpdated(payload.repository.full_name, payload.issue.number, octokit);
-    if (!updatedDependencies.length || allVersionsChecked(updatedDependencies)) {
+
+    if (!updatedDependencies.length) {
+        await communicateNoDirectDepsFound(payload, octokit);
+        return;
+    }
+
+    if (allVersionsChecked(updatedDependencies)) {
         await communicatePRLooksGood(payload, updatedDependencies, octokit);
         return;
     }
@@ -83,10 +89,22 @@ export async function deleteRepositoryLocally(payload: IssueCommentEvent): Promi
 }
 
 async function communicatePRLooksGood(payload: IssueCommentEvent, updatedDependencies: DependencyUpdate[], octokit: Octokit): Promise<void> {
-    Logger.info('Responding that PR with no dependency updates looks good');
+    Logger.info('Responding that PR looks good since we checked all updates');
 
     const message = await getApprovalMessage(updatedDependencies);
 
+    await getAndUpdateLoadingComment(message, payload, octokit);
+}
+
+async function communicateNoDirectDepsFound(payload: IssueCommentEvent, octokit: Octokit): Promise<void> {
+    Logger.info('Responding that PR with no dependency updates looks good');
+
+    let message = `:cyclone:&nbsp;&nbsp;No **direct** dependency updates found in this PR.\n\n`;
+
+    await getAndUpdateLoadingComment(message, payload, octokit);
+}
+
+async function getAndUpdateLoadingComment(message: string, payload: IssueCommentEvent, octokit: Octokit): Promise<void> {
     const loadingCommentId = await getBreakingChangesLoadingCommentId(payload, octokit);
 
     if (loadingCommentId) {
