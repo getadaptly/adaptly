@@ -22,6 +22,9 @@ type Environment = {
     AXIOM_TOKEN: string;
     AXIOM_ORG_ID: string;
     AXIOM_DATASET: string;
+
+    // Helicone
+    HELICONE_API_KEY: string;
 };
 
 export const getEnv = <K extends keyof Environment>(key: K): Environment[K] => {
