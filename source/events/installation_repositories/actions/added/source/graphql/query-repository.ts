@@ -23,11 +23,11 @@ async function getBotPRs(organization: string, repo: GitHubRepository): Promise<
     const botPRs: GitHubPullRequest[] = [];
 
     while (hasMorePRs) {
-        const { pullRequests, hasNextPage: hasNextPagePR, endCursor } = await getPRsBatch(organization, repo.name, cursorPR);
+        const { pullRequests, hasNextPage, endCursor } = await getPRsBatch(organization, repo.name, cursorPR);
 
         botPRs.push(...pullRequests);
 
-        hasMorePRs = hasNextPagePR;
+        hasMorePRs = hasNextPage;
         cursorPR = endCursor;
     }
 
