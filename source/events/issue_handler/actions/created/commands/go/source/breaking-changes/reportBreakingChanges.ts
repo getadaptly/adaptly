@@ -18,7 +18,7 @@ export async function reportBreakingChanges(
     if (dependencyUpdate.dependencyName.startsWith('@types/')) {
         const message = await getBreakingChangesMessage({ ...dependencyUpdate }, [
             {
-                title: 'Adaptly ignores Type updates',
+                title: `${dependencyUpdate.dependencyName}: Adaptly ignores Type updates`,
                 description: 'Types have no clear source of change logs so Adaptly does not check Type updates'
             }
         ]);

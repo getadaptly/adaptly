@@ -23,12 +23,12 @@ async function getBotPRs(organization: string, repo: GitHubRepository): Promise<
     const botPRs: GitHubPullRequest[] = [];
 
     while (hasMorePRs) {
-        const { pullRequests, hasNextPage: hasNextPagePR, endCursor: endCursorPR } = await getPRsBatch(organization, repo.name, cursorPR);
+        const { pullRequests, hasNextPage: hasNextPagePR, endCursor } = await getPRsBatch(organization, repo.name, cursorPR);
 
         botPRs.push(...pullRequests);
 
         hasMorePRs = hasNextPagePR;
-        cursorPR = endCursorPR;
+        cursorPR = endCursor;
     }
 
     botPRs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
