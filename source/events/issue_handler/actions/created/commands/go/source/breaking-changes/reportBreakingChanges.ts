@@ -6,12 +6,16 @@ import { getBreakingChangesMessage } from './report';
 import { postComment } from '@adaptly/services/github/issues/comments/postComment';
 import { extractBreakingChanges, moveCursorVersion } from './findBreakingChanges';
 
+type Return = {
+    status: 'no-breaking-changes' | 'breaking-changes';
+};
+
 export async function reportBreakingChanges(
     repoFullName: string,
     prNumber: number,
     dependencyUpdate: DependencyUpdate,
     octokit: Octokit
-): Promise<void> {
+): Promise<Return> {
     let cursorVersion: string | undefined = moveCursorVersion(dependencyUpdate);
     let breakingChangesEncountered = false;
 
@@ -24,7 +28,10 @@ export async function reportBreakingChanges(
         ]);
 
         await postComment(repoFullName, prNumber, message, octokit);
-        return;
+
+        return {
+            status: 'breaking-changes'
+        };
     }
 
     while (cursorVersion) {
@@ -47,5 +54,13 @@ export async function reportBreakingChanges(
     if (!breakingChangesEncountered) {
         const message = await getBreakingChangesMessage({ ...dependencyUpdate, cursorVersion: dependencyUpdate.targetVersion }, []);
         await postComment(repoFullName, prNumber, message, octokit);
+
+        return {
+            status: 'no-breaking-changes'
+        };
     }
+
+    return {
+        status: 'breaking-changes'
+    };
 }

@@ -4,6 +4,7 @@ import { getOctokit } from '@adaptly/services/github/auth/octokit';
 import { getPackagesDependenciesUpdated } from '@adaptly/events/issue_handler/actions/created/commands/go/source/pr-dependencies';
 import { reportBreakingChanges } from '@adaptly/events/issue_handler/actions/created/commands/go/source/breaking-changes/reportBreakingChanges';
 import { DEPENDABOT_BOT_LOGIN, RENOVATE_BOT_LOGIN } from '@adaptly/consts';
+import { postReviewComment } from '@adaptly/services/github/issues/review/postReviewComment';
 
 export const opened = async (payload: PullRequestOpenedEvent) => {
     const repoName = payload.repository.full_name;
@@ -20,7 +21,15 @@ export const opened = async (payload: PullRequestOpenedEvent) => {
     const { octokit } = await getOctokit(repoName);
 
     const updatedDependencies = await getPackagesDependenciesUpdated(repoName, prNumber, octokit);
+
+    let prStatus = 'no-breaking-changes';
+
     for (let dependency of updatedDependencies) {
-        await reportBreakingChanges(repoName, prNumber, dependency, octokit);
+        const result = await reportBreakingChanges(repoName, prNumber, dependency, octokit);
+        prStatus = result.status;
+    }
+
+    if (prStatus === 'no-breaking-changes') {
+        await postReviewComment(repoName, prNumber, '', 'APPROVE', octokit);
     }
 };
