@@ -124,7 +124,7 @@ export class TypeScriptImportChecker implements ImportChecker {
             }
             const expression = callExpression.getExpression();
 
-            if (expression.getKind() !== ts.SyntaxKind.ImportKeyword) {
+            if ((expression.getKind() as number) !== ts.SyntaxKind.ImportKeyword) {
                 continue; // Skip non-import function expressions
             }
 

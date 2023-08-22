@@ -38,11 +38,13 @@ async function getBotPRs(organization: string, repo: GitHubRepository): Promise<
     return botPRs;
 }
 
-async function getPRsBatch(
-    organization: string,
-    repoName: string,
-    after: string | null
-): Promise<{ pullRequests: GitHubPullRequest[]; hasNextPage: boolean; endCursor: string }> {
+type PRsBatch = {
+    pullRequests: GitHubPullRequest[];
+    hasNextPage: boolean;
+    endCursor: string;
+};
+
+async function getPRsBatch(organization: string, repoName: string, after: string | null): Promise<PRsBatch> {
     const pullRequests: GitHubPullRequest[] = [];
 
     const response = await runQuery<QueryPullRequestsReturn>(QueryPullRequests, {
