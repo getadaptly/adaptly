@@ -5,6 +5,7 @@ import Logger from '@adaptly/logging/logger';
 import { ISSUE_EVENT, issueHandler } from '@adaptly/events/issue_handler';
 import { INSTALLATION_REPOSITORIES_EVENT, installationRepositoriesHandler } from '@adaptly/events/installation_repositories';
 import { INSTALLATION_EVENT, installationHandler } from '@adaptly/events/installation';
+import { PULL_REQUEST_EVENT, pullRequestHandler } from '@adaptly/events/pull_request';
 
 const webhook = express.Router();
 
@@ -35,6 +36,9 @@ async function processRequest(req: Request, res: Response): Promise<Response> {
             break;
         case ISSUE_EVENT:
             await issueHandler(req);
+            break;
+        case PULL_REQUEST_EVENT:
+            await pullRequestHandler(req);
             break;
         default: {
             Logger.info('Webook ignored unsupported event type', { eventType });
