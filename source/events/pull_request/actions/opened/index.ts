@@ -8,7 +8,7 @@ import { postReviewComment } from '@adaptly/services/github/issues/review/postRe
 
 export const opened = async (payload: PullRequestOpenedEvent) => {
     const repoName = payload.repository.full_name;
-    const prNumber = payload.pull_request.id;
+    const prNumber = payload.pull_request.number;
     const author = payload.sender.login;
 
     if (author !== RENOVATE_BOT_LOGIN && author !== DEPENDABOT_BOT_LOGIN) {
