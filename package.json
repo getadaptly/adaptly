@@ -66,6 +66,7 @@
         "cors": "2.8.5",
         "express": "4.17.1",
         "fast-glob": "3.3.0",
+        "graphql-request": "6.1.0",
         "jsonwebtoken": "^9.0.0",
         "markdown-it": "^13.0.1",
         "openai": "^3.3.0",

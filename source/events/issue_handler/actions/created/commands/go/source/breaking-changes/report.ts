@@ -50,7 +50,7 @@ export async function getBreakingChangesLoadingCommentId(payload: IssueCommentEv
     return loadingComment?.id;
 }
 
-async function getBreakingChangesMessage(dependencyUpdate: DependencyUpdate, breakingChanges: BreakingChange[]): Promise<string> {
+export async function getBreakingChangesMessage(dependencyUpdate: DependencyUpdate, breakingChanges: BreakingChange[]): Promise<string> {
     let message = '';
     if (breakingChanges.length) {
         const releaseUrl = await getReleaseUrl(dependencyUpdate.dependencyRepoUrl, dependencyUpdate.cursorVersion);
