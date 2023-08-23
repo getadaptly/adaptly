@@ -111,7 +111,7 @@ export async function findBreakingChanges(dependencyUpdate: DependencyUpdate, oc
     };
 }
 
-async function extractBreakingChanges(
+export async function extractBreakingChanges(
     packageName: string,
     cursorVersion: string,
     dependecyRepoUrl: string,

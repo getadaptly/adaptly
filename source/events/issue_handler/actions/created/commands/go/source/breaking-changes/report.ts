@@ -50,16 +50,16 @@ export async function getBreakingChangesLoadingCommentId(payload: IssueCommentEv
     return loadingComment?.id;
 }
 
-async function getBreakingChangesMessage(dependencyUpdate: DependencyUpdate, breakingChanges: BreakingChange[]): Promise<string> {
+export async function getBreakingChangesMessage(dependencyUpdate: DependencyUpdate, breakingChanges: BreakingChange[]): Promise<string> {
     let message = '';
     if (breakingChanges.length) {
         const releaseUrl = await getReleaseUrl(dependencyUpdate.dependencyRepoUrl, dependencyUpdate.cursorVersion);
 
         if (dependencyUpdate.dependencyName.startsWith('@types/')) {
-            return `:see_no_evil:&nbsp;&nbsp;Adaptly ignores Type updates.Types have no clear source of change logs so Adaptly does not check Type updates.\n\nPackage: [${dependencyUpdate.dependencyName}](${dependencyUpdate.dependencyUrl})\nVersion: [${dependencyUpdate.cursorVersion}](${releaseUrl})\n`;
+            return `:see_no_evil:&nbsp;&nbsp;${dependencyUpdate.dependencyName}: Adaptly ignores Type updates.Types have no clear source of change logs so Adaptly does not check Type updates.\n\nPackage: [${dependencyUpdate.dependencyName}](${dependencyUpdate.dependencyUrl})\nVersion: [${dependencyUpdate.cursorVersion}](${releaseUrl})\n`;
         }
 
-        message = `:information_source:&nbsp;&nbsp;Breaking Changes in the Dependency's Changelog. Check breaking changes and run \`/adaptly go\` to continue checking next versions.\n\nPackage: [${dependencyUpdate.dependencyName}](${dependencyUpdate.dependencyUrl})\nVersion: [${dependencyUpdate.cursorVersion}](${releaseUrl})\n`;
+        message = `### :warning:&nbsp;&nbsp;${dependencyUpdate.dependencyName}@${dependencyUpdate.cursorVersion}`;
 
         let breakingChangeNumber = 1;
 
@@ -74,11 +74,9 @@ async function getBreakingChangesMessage(dependencyUpdate: DependencyUpdate, bre
 
         message += '\n\n</details>\n';
     } else {
-        message = `:white_check_mark:&nbsp;&nbsp;No breaking changes found.\n\n`;
-        const releaseUrl = await getReleaseUrl(dependencyUpdate.dependencyRepoUrl, dependencyUpdate.cursorVersion);
-        message += `Package: [${dependencyUpdate.dependencyName}](${dependencyUpdate.dependencyUrl})\nVersion: [${dependencyUpdate.cursorVersion}](${releaseUrl})\n\n`;
+        message = `### :white_check_mark:&nbsp;&nbsp;${dependencyUpdate.dependencyName}\nNo breaking changes found.\n\n`;
     }
-    message += getProgressMessage(dependencyUpdate);
+    // message += getProgressMessage(dependencyUpdate);
 
     return message;
 }

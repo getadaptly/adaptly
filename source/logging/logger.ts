@@ -12,7 +12,11 @@ export default class Logger {
         const level = 'INFO';
 
         Logger.ingestIntoAxiom({ level, message, context });
-        console.info(`[${level}] ${message}`, context);
+        if (context) {
+            console.info(`[${level}] ${message}`, context);
+        } else {
+            console.info(`[${level}] ${message}`);
+        }
     }
 
     static warn(message: string, context?: Object) {
