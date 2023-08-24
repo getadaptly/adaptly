@@ -8,7 +8,7 @@
 <a href="https://docs.adaptly.dev/">
     <img alt="Docs" src="https://img.shields.io/badge/Docs-docs.adaptly.dev-blue?link=https%3A%2F%2Fdocs.adaptly.dev">
 </a> 
-<a href="https://discord.gg/ueFdnVbW">
+<a href="https://discord.gg/q9VyVVckgQ">
     <img src="https://dcbadge.vercel.app/api/server/ueFdnVbW?style=flat" />
 </a>
 <a href="https://twitter.com/adaptly_dev">
