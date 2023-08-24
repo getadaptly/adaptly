@@ -18,10 +18,7 @@
 
 <br />
 
-Next time when you update a dependency, forget about:
-1. Reading dependency changelogs
-2. Figuring out breaking changes
-3. Wondering what code needs to be refactored to work with the latest dependency version
+Next time when you update a dependency, forget about manually checking if changelogs contain breaking changes.
 
 Adaptly will do that for you.
 
@@ -31,48 +28,15 @@ Adaptly will do that for you.
 
 <br />
 
-## How it works
+## Try Adaptly
 
-Trigger Adaptly with a simple comment on any PR that updates dependencies:
-
-<img src="https://github.com/getadaptly/adaptly/assets/42170848/1624348a-d82f-41d5-89d8-5fee8abeb75e" width="640px">
-
-
-![spacer](https://github.com/getadaptly/adaptly/assets/42170848/f263691c-dca6-437b-bd29-1dac8c59cda1)
-
-
-Then, Adaptly will:
-
-1. Flag breaking dependency changes&nbsp;&nbsp;⚠️
-2. Highlight code that requires refactoring&nbsp;&nbsp;‼️
-
-<br />
-
-<img src="https://github.com/getadaptly/adaptly/assets/42170848/33eaf18b-7584-48f5-8d9e-6137da1ce67f" width="640px">
-
-
-![spacer](https://github.com/getadaptly/adaptly/assets/42170848/f263691c-dca6-437b-bd29-1dac8c59cda1)
-
-<img src="https://github.com/getadaptly/adaptly/assets/42170848/83a2f63e-a632-4110-b567-0ce011c44b27" width="640px">
-
-<br />
-
-## Features
-
-### Seamless Version Transition 
-Adaptly safely guides you from the current version to the target version, pausing at versions that require codebase refactors. After addressing issues, trigger Adaptly again to continue from where it stopped.
-
-### Flexible Dependency Handling
-Adaptly can handle multiple dependency updates within a pull request. If additional dependencies are updated mid-process, Adaptly incorporates them into its ongoing analysis.
+1. Add Adaptly to your repository by installing [Adaptly github app](https://github.com/getadaptly/adaptly).
+2. Once installed, Adaptly will analyse all open Dependabot and Renovate PRs and leave PR comments to inform about breaking changes found or PRs being good to merge.
+3. When a new Dependabot or Renovate PRs are open, it will analyse them automatically.
 
 ### Languages supported
 
 <img src="https://github.com/getadaptly/adaptly/assets/42170848/8ccf6a7e-29f9-4482-8c70-e67414a3c758" width="128px">
-
-
-## Getting started
-
-See [Adaptly docs](https://docs.adaptly.dev/) on how to connect it to your repository and save time by letting Adaptly guide you during dependency updates.
 
 <br />
 
