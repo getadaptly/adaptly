@@ -28,8 +28,4 @@ export const opened = async (payload: PullRequestOpenedEvent) => {
         const result = await reportBreakingChanges(repoName, prNumber, dependency, octokit);
         prStatus = result.status;
     }
-
-    if (prStatus === 'no-breaking-changes') {
-        await postReviewComment(repoName, prNumber, '', 'APPROVE', octokit);
-    }
 };

@@ -27,10 +27,6 @@ export const added = async (payload: InstallationRepositoriesEvent) => {
                 const result = await reportBreakingChanges(repo.full_name, pr.number, dependency, octokit);
                 prStatus = result.status;
             }
-
-            if (prStatus === 'no-breaking-changes') {
-                await postReviewComment(repo.full_name, pr.number, '', 'APPROVE', octokit);
-            }
         }
     }
 };
