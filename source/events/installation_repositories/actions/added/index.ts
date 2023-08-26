@@ -6,6 +6,7 @@ import { getRepositoryBotPRs } from './source/graphql/query-repository';
 import { getPackagesDependenciesUpdated } from '@adaptly/events/issue_handler/actions/created/commands/go/source/pr-dependencies';
 import { reportBreakingChanges } from '@adaptly/events/issue_handler/actions/created/commands/go/source/breaking-changes/reportBreakingChanges';
 import { postReviewComment } from '@adaptly/services/github/issues/review/postReviewComment';
+import { createRepository } from '@adaptly/database/operations/repository/create';
 
 export const added = async (payload: InstallationRepositoriesEvent) => {
     Logger.info(`Adaptly has been installed on new repositories`, { repositories: payload.repositories_added.map((repo) => repo.full_name) });
@@ -13,6 +14,8 @@ export const added = async (payload: InstallationRepositoriesEvent) => {
     for (const repo of payload.repositories_added) {
         const { octokit } = await getOctokit(repo.full_name);
         const [owner, name] = getRepositoryOwnerAndName(repo.full_name);
+
+        await createRepository(repo.full_name);
 
         const prs = await getRepositoryBotPRs(owner, name);
 
